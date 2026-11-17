@@ -132,10 +132,10 @@ def _gemini(prompt, max_tokens=4096, json_mode=False):
     if json_mode:
         body["generationConfig"]["responseMimeType"] = "application/json"
     last = None
-    for model in _gemini_candidates(key)[:5]:
+    for model in _gemini_candidates(key)[:4]:
         try:
             r = requests.post(f"{_GEMINI_BASE}/models/{model}:generateContent",
-                              headers={"x-goog-api-key": key}, json=body, timeout=90)
+                              headers={"x-goog-api-key": key}, json=body, timeout=45)
             j = r.json()
             if r.status_code >= 400 or "error" in j:
                 raise RuntimeError(json.dumps(j.get("error", j))[:300])
