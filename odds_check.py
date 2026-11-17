@@ -9,7 +9,9 @@ import config
 out = {"games": []}
 try:
     import oddspapi
-    out["sports"] = [f"{s.get('sportId')}: {s.get('sportName')}" for s in oddspapi._get("sports")][:60]
+    oddspapi._version()
+    out["api_version"] = oddspapi._cache.get("ver")
+    out["sports"] = [f"{s.get('sportId')}: {s.get('sportName')}" for s in oddspapi._cache.get("sports", [])][:60]
 except Exception as e:
     out["sports"] = str(e)
 for g in get_trending(config.LEAGUES, top_n=3)[:3]:
