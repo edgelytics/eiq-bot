@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-17T20:56:57+00:00",
+ "updated": "2026-11-17T21:48:14+00:00",
  "account": {
   "username": "edgelytics.iq",
   "followers_count": 3,
@@ -12,6 +12,12 @@
    "followers": 3,
    "views": 0,
    "likes": 7
+  },
+  {
+   "t": "2026-11-17T21:48:14+00:00",
+   "followers": 3,
+   "views": 315,
+   "likes": 7
   }
  ],
  "media": [
@@ -20,60 +26,60 @@
    "permalink": "https://www.instagram.com/reel/Df2nMJHjh1z/",
    "timestamp": "2026-11-17T18:49:41+0000",
    "type": "REELS",
-   "thumb": "https://scontent-iad6-1.cdninstagram.com/v/t51.71878-15/910814672_1008653431606290_5983485072805713952_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=109&_nc_map=urlgen_bucketless&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=ommi6uB27k4Q7kNvwG3VZGT&_nc_oc=AdqxdtraVFLzYtW08-KIe4rSUi4Ivpt3Ia-8La8EOBUg2beBDJX7A6SQQnCOilpaTIg&_nc_zt=23&_nc_ht=scontent-iad6-1.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=uFa_zHgKh-Lh6PvTP5NmkA&_nc_tpa=Q5bMBQJngFUZNYYrBDgN4Z27FqQh3mGBdUBmMB4AtElS4dMgEg34VXTBshuEiYJYYNvxB5OwnkNswmi8ug&_nc_ct=RQosPBUKFQQAAAA&oh=00_AQQRjQBugawmeryeJUXSgBUfeTiCWCaQVArbNStMA0xcNA&oe=6B029386",
+   "thumb": "https://scontent-sea5-2.cdninstagram.com/v/t51.71878-15/910814672_1008653431606290_5983485072805713952_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=109&_nc_map=urlgen_bucketless&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=ommi6uB27k4Q7kNvwHyh6Qh&_nc_oc=AdpCHHqUyZSYRxwzr9v5dH7SlOP3QRtH92vjiQOjfLC7_dTXfWzWQiiLcd2mmwd2xh0&_nc_zt=23&_nc_ht=scontent-sea5-2.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=nwpF2ZUDGfHWgGiCTBmmMA&_nc_tpa=Q5bMBQIOfA9YssfB7ybuFpNTmuxCIBdpy_JY7_SmIbSWLryTXqEfAdr-s0-ecjKxfakQmprLXyx0IF6cIA&_nc_ct=RQosPBUKFQQAAAA&oh=00_AQSIb6FWeqVHSFzd-R2P_Aj8Cn7ux5yAVmnK8-HkOB2DZA&oe=6B029386",
    "caption": "DraftKings moved San Antonio from -7.5 to -9.5 after Detroit ruled out four players.",
    "likes": 1,
    "comments": 0,
-   "views": 0,
-   "reach": 0,
+   "views": 25,
+   "reach": 18,
    "saves": 0,
    "shares": 0,
-   "interactions": 0
+   "interactions": 1
   },
   {
    "id": "18376914250301450",
    "permalink": "https://www.instagram.com/reel/Df086IKj9dl/",
    "timestamp": "2026-11-17T03:21:04+0000",
    "type": "REELS",
-   "thumb": "https://scontent-iad6-1.cdninstagram.com/v/t51.71878-15/913416545_1607648570612410_361130378043552874_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&_nc_map=urlgen_bucketless&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=sZI_ohFUZIwQ7kNvwHC9TTh&_nc_oc=AdpsGwO2GbUAliiNLnOe3zSHNgLMV87HxcBisT-HEroA1KdnyOnOjZhgvEZcVR1n6g8&_nc_zt=23&_nc_ht=scontent-iad6-1.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=uFa_zHgKh-Lh6PvTP5NmkA&_nc_tpa=Q5bMBQKuW7WL_ynvvYumMAoITOa2UVlVXLHLY5bXNflpmNA3CBTQh9HATzreu9unvbast1kdxWS2jzV3nA&_nc_ct=RQosPBUKFQQAAAA&oh=00_AQT17xMOIqYP3cxldMHTSjLoDw9ANzgETWl1DtTTJLpPaA&oe=6B029850",
+   "thumb": "https://scontent-sea5-2.cdninstagram.com/v/t51.71878-15/913416545_1607648570612410_361130378043552874_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&_nc_map=urlgen_bucketless&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=sZI_ohFUZIwQ7kNvwFlk4Bo&_nc_oc=AdqbTb-iZlsDfjlpMsPjE3Ti9tFveDIrrmjI-bvXGDGm-ul3ATfbGwdU0KqGHvWqJUk&_nc_zt=23&_nc_ht=scontent-sea5-2.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=nwpF2ZUDGfHWgGiCTBmmMA&_nc_tpa=Q5bMBQLLkff_q1LYr0-37jZ2s7WFwQv4wKHZVwZ1jO6G-3jUoQesfH8icdyTJCDvUbF1wvgo8TjXIacCzg&_nc_ct=RQosPBUKFQQAAAA&oh=00_AQQdvwsZ6ab_1maW-UxGoz-N6nexN-sQ5je1eg3shG-oaw&oe=6B029850",
    "caption": "Stars at Golden Knights. The line says VGK -135.",
    "likes": 0,
    "comments": 0,
-   "views": 0,
-   "reach": 0,
-   "saves": 0,
+   "views": 68,
+   "reach": 60,
+   "saves": 1,
    "shares": 0,
-   "interactions": 0
+   "interactions": 1
   },
   {
    "id": "18111115729953140",
    "permalink": "https://www.instagram.com/reel/DbZRRJKxu0O/",
    "timestamp": "2026-07-29T23:14:53+0000",
    "type": "REELS",
-   "thumb": "https://scontent-iad3-1.cdninstagram.com/v/t51.82787-15/758499827_18074987405443536_886134099439595032_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=105&_nc_map=urlgen_bucketless&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=neHtnAyI3bAQ7kNvwFBqLU3&_nc_oc=AdriuG0siaQDqUDjZZZar-_n8QU9xxA_FIRRQz60pzsQDSADc6qerj3RalG2XTUxq1o&_nc_zt=23&_nc_ht=scontent-iad3-1.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=uFa_zHgKh-Lh6PvTP5NmkA&_nc_tpa=Q5bMBQJu023nbKx4lEngbTigmPq51bV-p6aIseKCAijkvhO2ZU7pleSxLN1t8OuAKKGlXv_Q3-CbAKkOxA&_nc_ct=RQosPBUKFQQAAAA&oh=00_AQR1c07wL_oIu3arpIoXYngXHsvjsasD9i9HJBM1jbFmOg&oe=6B027735",
+   "thumb": "https://scontent-sea5-1.cdninstagram.com/v/t51.82787-15/758499827_18074987405443536_886134099439595032_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=105&_nc_map=urlgen_bucketless&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=neHtnAyI3bAQ7kNvwHRYx2R&_nc_oc=Adon8EJdVFDHCIXl-kqqaw-FJcpeMSDci-q_XOZ7E1HN0fMTNZ8P0r0vJAL7j63W4QY&_nc_zt=23&_nc_ht=scontent-sea5-1.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=nwpF2ZUDGfHWgGiCTBmmMA&_nc_tpa=Q5bMBQLM-bVW6LWOmXXLeXvVxNxmgdrAdqzDHUMb7j8U8U3uOzJlN6ADYVy-GAAF9sMF-P2IuGd12zIHjw&_nc_ct=RQosPBUKFQQAAAA&oh=00_AQRkV4KCuD1rn3cPmQNFvy2Ug4zijeB1q-DOnlN9wStXzQ&oe=6B02AF75",
    "caption": "In 1984, a math nerd named Bill Benter moved to Hong Kong with a theory: horse racing odds were public, but that didn\u2019t mean they were corre",
    "likes": 2,
    "comments": 0,
-   "views": 0,
-   "reach": 0,
+   "views": 117,
+   "reach": 107,
    "saves": 0,
    "shares": 0,
-   "interactions": 0
+   "interactions": 2
   },
   {
    "id": "18046505663672703",
    "permalink": "https://www.instagram.com/reel/DbWzkwVxjsa/",
    "timestamp": "2026-07-29T00:16:40+0000",
    "type": "REELS",
-   "thumb": "https://scontent-iad3-1.cdninstagram.com/v/t51.82787-15/757545468_18074671163443536_6014940706598105782_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=105&_nc_map=urlgen_bucketless&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=IWJexFKwQjEQ7kNvwFn9vW-&_nc_oc=AdrupPvgqNuHfBJw8cfGtabB3Me-rDX_GbR19aZYbGk4O7jZD3spq_QTBGZY_Bc1_84&_nc_zt=23&_nc_ht=scontent-iad3-1.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=uFa_zHgKh-Lh6PvTP5NmkA&_nc_tpa=Q5bMBQJGJEIzbTOEXDjZtZZJj21KmCBNPpHbwBemAy3wslr0dsjYww5fdFmF4OtDhp_aVoCvO8S68Fi8Qw&_nc_ct=RQosPBUKFQQAAAA&oh=00_AQQ3H-3RMac-tH2bfqnbiQWFxctvlJauroTZzaGN7lAbPw&oe=6B028421",
+   "thumb": "https://scontent-sea5-2.cdninstagram.com/v/t51.82787-15/757545468_18074671163443536_6014940706598105782_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=105&_nc_map=urlgen_bucketless&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=IWJexFKwQjEQ7kNvwHXxntt&_nc_oc=Adr0SfARSa88GI8X3dy26cs3hQRl8DjTJc9PjYd1hODu0tlopzPy7SzxR5eF7ws0SAA&_nc_zt=23&_nc_ht=scontent-sea5-2.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=nwpF2ZUDGfHWgGiCTBmmMA&_nc_tpa=Q5bMBQKH4RyIzb5I8UJV7oKzSWS5AT4pePq7tBvOWUSSEQjPfwLA4xrvFl3P6dEQDh19wPfviSd3vhojHg&_nc_ct=RQosPBUKFQQAAAA&oh=00_AQSjbRNsIFCvpApw7-RVrOYv8_igYzIPsoiaGis8WymHyQ&oe=6B028421",
    "caption": "Why did that line move 40 cents in under 10 seconds? It\u2019s not random \u2014 sharp money, book",
    "likes": 2,
    "comments": 0,
-   "views": 0,
-   "reach": 0,
+   "views": 86,
+   "reach": 80,
    "saves": 0,
    "shares": 0,
-   "interactions": 0
+   "interactions": 2
   },
   {
    "id": "18140393914565305",
@@ -84,12 +90,12 @@
    "caption": "We\u2019re building a community around understanding sports markets \u2014 not around picks. Expected value, arbitrage, predictive models, backtesting",
    "likes": 2,
    "comments": 0,
-   "views": 0,
-   "reach": 0,
+   "views": 19,
+   "reach": 6,
    "saves": 0,
    "shares": 0,
-   "interactions": 0
+   "interactions": 2
   }
  ],
- "error": "Reel views unavailable: (#10) Application does not have permission for this action"
+ "error": null
 }
