@@ -17,7 +17,7 @@ on:
         description: "Build only, don't post (true/false)"
         default: "true"
       mode:
-        description: "post (default) or metrics (just refresh dashboard stats)"
+        description: "post (default), metrics (refresh dashboard stats) or oddscheck (test the odds feed)"
         default: "post"
 
 permissions:
@@ -39,6 +39,7 @@ jobs:
       PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
       PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
       ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+      ODDSPAPI_KEY: ${{ secrets.ODDSPAPI_KEY }}
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
       AUTOPOST: ${{ vars.AUTOPOST || 'true' }}      # repo variable = your kill switch
       DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
@@ -52,7 +53,7 @@ jobs:
       - name: Is a slot coming up?
         id: gate
         run: |
-          if [ "${{ github.event.inputs.mode }}" = "metrics" ]; then echo "slot=" >> $GITHUB_OUTPUT
+          if [ "${{ github.event.inputs.mode }}" = "metrics" ] || [ "${{ github.event.inputs.mode }}" = "oddscheck" ]; then echo "slot=" >> $GITHUB_OUTPUT
           elif [ -n "${{ github.event.inputs.slot }}" ]; then echo "slot=${{ github.event.inputs.slot }}" >> $GITHUB_OUTPUT
           else echo "slot=$(python gate.py)" >> $GITHUB_OUTPUT; fi
 
@@ -82,6 +83,13 @@ jobs:
           ARGS="--slot ${{ steps.gate.outputs.slot }}"
           [ "${{ github.event.inputs.post_now }}" = "true" ] && ARGS="$ARGS --now"
           python run_slot.py $ARGS
+
+      - name: Odds feed check
+        if: github.event.inputs.mode == 'oddscheck'
+        continue-on-error: true
+        run: |
+          pip install -q requests
+          python odds_check.py
 
       - name: Refresh dashboard stats
         if: always()
