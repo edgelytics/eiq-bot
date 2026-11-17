@@ -1,0 +1,23 @@
+{
+ "games": [
+  {
+   "game": "Detroit Pistons @ San Antonio Spurs (NBA)",
+   "espn_home_line": "-9.5",
+   "lines": null,
+   "debug": {}
+  },
+  {
+   "game": "Colorado Avalanche @ Utah Mammoth (NHL)",
+   "espn_home_line": "-1.5",
+   "lines": null,
+   "debug": {}
+  },
+  {
+   "game": "Dallas Stars @ Vegas Golden Knights (NHL)",
+   "espn_home_line": "-1.5",
+   "lines": null,
+   "debug": {}
+  }
+ ],
+ "sports": "sports HTTP 401: {\"error\":{\"message\":\"Invalid API key\",\"code\":\"INVALID_API_KEY\",\"details\":\"The provided API key is invalid or does not exist.\"}}"
+}
