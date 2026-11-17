@@ -116,7 +116,10 @@ def main():
             tracks = []
             for q in (None, "hype", "trap", "phonk", "sports"):
                 try:
-                    tracks += trending_music(q)
+                    got = trending_music(q)
+                    for x in got:   # None = Instagram's trending chart, in its own popularity order
+                        x["_src"] = "trending" if q is None else "search"
+                    tracks += got
                 except Exception as e:
                     print(f"[run] audio search {q!r} failed: {e}")
             if not tracks:
