@@ -8,6 +8,7 @@ The bot remembers clip IDs it already used (state file) so footage doesn't repea
 """
 import os
 import random
+import re
 import subprocess
 import requests
 import numpy as np
@@ -16,13 +17,38 @@ from config import PEXELS_KEY
 PIXABAY_KEY = os.environ.get("PIXABAY_API_KEY")
 W, H, FPS = 1080, 1920, 30
 
-FALLBACK_QUERIES = {
-    "NFL": ["american football stadium", "football field night", "stadium lights", "football crowd", "american football"],
-    "CFB": ["college football", "football stadium crowd", "marching band stadium", "stadium lights"],
-    "NBA": ["basketball arena", "basketball court", "basketball hoop", "basketball game", "arena crowd"],
-    "NHL": ["ice hockey", "hockey arena", "ice rink", "hockey game", "arena crowd"],
-    "_":   ["stadium lights", "sports crowd cheering", "city night lights", "money counting", "scoreboard"],
+# Searches per sport (all on-topic). The bot rotates through these.
+SPORT_QUERIES = {
+    "NFL": ["american football", "american football game", "football stadium", "quarterback", "touchdown", "american football field"],
+    "CFB": ["american football", "college football", "football stadium", "american football game", "touchdown"],
+    "NBA": ["basketball", "basketball game", "basketball dunk", "basketball court", "basketball player", "basketball hoop"],
+    "NHL": ["ice hockey", "hockey game", "hockey player", "ice hockey puck", "hockey arena"],
 }
+# A clip must carry at least one of these tags to be used...
+REQUIRED_TAGS = {
+    "NFL": ["american football", "nfl", "quarterback", "touchdown", "gridiron", "football helmet"],
+    "CFB": ["american football", "quarterback", "touchdown", "gridiron", "football helmet", "college football"],
+    "NBA": ["basketball", "nba", "dunk", "slam dunk"],
+    "NHL": ["hockey", "ice hockey", "nhl", "puck"],
+}
+# ...and none of these.
+BANNED_TAGS = {
+    "NFL": ["soccer", "rugby", "futsal", "fifa", "messi", "goalkeeper"],
+    "CFB": ["soccer", "rugby", "futsal", "fifa", "goalkeeper"],
+    "NBA": ["netball", "volleyball"],
+    "NHL": ["field hockey", "figure skating"],
+}
+ALWAYS_BANNED = ["wedding", "christmas", "baby", "cat", "dog", "food", "nature", "beach", "flower", "concert",
+                 "dance", "yoga", "fitness", "gym", "kids", "children", "toy", "cartoon", "animation", "3d"]
+
+
+def _on_topic(tags, league):
+    t = " " + re.sub(r"[^a-z0-9 ]+", " ", (tags or "").lower()) + " "
+    has = lambda w: f" {w} " in t          # whole-word / whole-phrase match
+    if any(has(b) for b in ALWAYS_BANNED + BANNED_TAGS.get(league, [])):
+        return False
+    req = REQUIRED_TAGS.get(league)
+    return any(has(r) for r in req) if req else True
 
 
 def _download(url, path):
@@ -33,14 +59,16 @@ def _download(url, path):
                 out.write(chunk)
 
 
-def _pixabay(query, used):
+def _pixabay(query, used, league=None):
     r = requests.get("https://pixabay.com/api/videos/",
-                     params={"key": PIXABAY_KEY, "q": query, "per_page": 50, "safesearch": "true",
-                             "video_type": "film", "order": "popular"}, timeout=20)
+                     params={"key": PIXABAY_KEY, "q": query, "per_page": 80, "safesearch": "true",
+                             "video_type": "film", "category": "sports"}, timeout=20)
     r.raise_for_status()
     out = []
     for h in r.json().get("hits", []):
-        if h.get("duration", 0) < 6 or f"px{h['id']}" in used:
+        if h.get("duration", 0) < 5 or f"px{h['id']}" in used:
+            continue
+        if not _on_topic(h.get("tags"), league):
             continue
         v = h.get("videos", {})
         f = v.get("large") if (v.get("large") or {}).get("url") else v.get("medium")
@@ -66,21 +94,28 @@ def _pexels(query, used):
 
 
 def fetch_clips(query, n=3, folder="cache/broll", league=None, used=()):
-    """Returns (paths, clip_ids). Empty if no key or nothing found."""
+    """Returns (paths, clip_ids). Only on-topic clips for the game's sport; empty -> branded background."""
     if not (PIXABAY_KEY or PEXELS_KEY):
         return [], []
     os.makedirs(folder, exist_ok=True)
     used = set(used)
-    queries = [query] + random.sample(FALLBACK_QUERIES.get(league, FALLBACK_QUERIES["_"]),
-                                      k=min(3, len(FALLBACK_QUERIES.get(league, FALLBACK_QUERIES["_"]))))
+    queries = list(SPORT_QUERIES.get(league, []))
+    random.shuffle(queries)
+    if not queries:
+        queries = [query]
     pool = []
     for q in queries:
         try:
-            pool += _pixabay(q, used) if PIXABAY_KEY else _pexels(q, used)
+            got = _pixabay(q, used, league) if PIXABAY_KEY else _pexels(q, used)
+            print(f"[broll] '{q}': {len(got)} on-topic clips")
+            pool += got
         except Exception as e:
             print(f"[broll] search '{q}' failed: {e}")
-        if len(pool) >= n * 4:
+        if len(pool) >= n * 3:
             break
+    if not pool and used:
+        # every on-topic clip has been used before: allow repeats rather than go off-topic
+        return fetch_clips(query, n, folder, league, used=())
     random.shuffle(pool)
     paths, ids, seen = [], [], set()
     for cid, url in pool:
