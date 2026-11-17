@@ -144,7 +144,8 @@ def vignette():
 def draw_hook(L, t, sc, g):
     d = ImageDraw.Draw(L)
     p, off = reveal(t, 0.0, 0.3)
-    tag = f"{g['league']} · {(g.get('networks') or ['TONIGHT'])[0].upper()} · TONIGHT" if g else "EDGELYTICS IQ"
+    net = (g.get("networks") or [None])[0] if g else None
+    tag = " · ".join(x for x in (g["league"], net.upper() if net else None, g.get("when", "tonight").upper()) if x) if g else "EDGELYTICS IQ"
     d.text((80, 470 + off), tag, font=font(MONO, 40), fill=A(GREEN, 255 * p))
     words = sc["text"].upper().split()
     accent = (sc.get("accent") or "").upper().strip(".,!?")
@@ -185,7 +186,10 @@ def draw_matchup(L, t, sc, g):
         d.rectangle([80 + dx, y0 + 24, 92 + dx, y0 + 296], fill=A(GREEN, 255 * p))
         d.text((130 + dx, y0 + 36), "AWAY" if i == 0 else "HOME", font=font(MONO, 34), fill=A(WHITE, 200 * p))
         d.text((126 + dx, y0 + 80), tm["abbr"], font=font(BLACKF, 170), fill=A(WHITE, 255 * p))
-        d.text((600 + dx, y0 + 140), tm["short"].upper(), font=font(XBOLD, 54), fill=A(WHITE, 255 * p))
+        nm = tm["short"].upper(); fs = 54
+        while fs > 30 and font(XBOLD, fs).getlength(nm) > 380:
+            fs -= 2
+        d.text((600 + dx, y0 + 140 + (54 - fs) // 2), nm, font=font(XBOLD, fs), fill=A(WHITE, 255 * p))
         d.text((600 + dx, y0 + 210), tm["record"], font=font(BOLD, 46), fill=A(WHITE, 190 * p))
     q = (t - 0.55) / 0.3
     if q > 0:
@@ -193,7 +197,7 @@ def draw_matchup(L, t, sc, g):
         di.ellipse([0, 0, 149, 149], fill=A(BG, 255), outline=A(GREEN, 255), width=6)
         di.text((75, 75), "@", font=font(BLACKF, 70), fill=A(WHITE, 255), anchor="mm")
         paste_scaled(L, im, 540, 670, ease_back(q), 1)
-    chips = [("SPREAD", g.get("spread_text") or "PK", None), ("TOTAL", None, g.get("total"))]
+    chips = [("PUCK LINE" if g.get("league") == "NHL" else "SPREAD", g.get("spread_text") or "PK", None), ("TOTAL", None, g.get("total"))]
     for i, (k, txt, num) in enumerate(chips):
         p, off = reveal(t, 0.8 + i * 0.15, 0.35)
         if p <= 0: continue
