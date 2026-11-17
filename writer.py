@@ -26,6 +26,12 @@ talks like a smart friend — never a tout. Rules:
 - Voiceover total 45-60 words (~20-26 seconds). Short punchy sentences. Write numbers the way
   they're spoken ("three and a half", "minus one-ten").
 - Do NOT reuse or closely copy any of these recent hooks: {recent_hooks}
+- "facts" in the game data was pulled minutes ago from ESPN and US sportsbooks. It is the ONLY outside
+  information you may use. Attribute it naturally: "ESPN's model gives them 62 percent", "FanDuel is
+  hanging minus three, DraftKings three and a half", "they're 7 and 3 against the spread". If a key player
+  is Out or Questionable, that's a great angle. Headlines are context — never quote them word for word.
+- If facts.sportsbook_lines.books_disagree is true, include a "books" scene (it shows a price-comparison
+  graphic across sportsbooks) and use it to teach line shopping.
 
 Today's angle for this slot: {angle}
 
@@ -35,12 +41,13 @@ The owner's playbook (follow it; it overrides the style notes above if they conf
 Game data:
 {game}
 
-Return ONLY valid JSON:
+Return ONLY valid JSON (omit the "books" scene if the books don't disagree):
 {{
   "scenes": [
     {{"type": "hook", "vo": "spoken line", "text": "on-screen, max 6 words", "accent": "one word from text to highlight"}},
     {{"type": "matchup", "vo": "spoken line introducing the game and the number"}},
     {{"type": "number", "vo": "spoken line about the line movement, key number or total", "label": "max 4 words"}},
+    {{"type": "books", "vo": "ONLY if books disagree: spoken line on the price difference between books", "label": "max 4 words"}},
     {{"type": "point", "vo": "spoken line", "eyebrow": "2-3 words", "text": "max 6 words"}},
     {{"type": "point", "vo": "spoken line", "eyebrow": "2-3 words", "text": "max 6 words"}},
     {{"type": "cta", "vo": "spoken line asking them to follow / comment", "text": "max 6 words"}}
@@ -173,17 +180,29 @@ def write_script(game, angle, recent_hooks=()):
             for sc in s["scenes"]:
                 if sc["type"] in ("hook", "point", "cta"):
                     sc.setdefault("text", sc["vo"][:40])
-            return _finish(s)
+            if not (((game.get("facts") or {}).get("sportsbook_lines") or {}).get("books_disagree")):
+                s["scenes"] = [sc for sc in s["scenes"] if sc["type"] != "books"]
+            return _finish(s, game)
         except Exception as e:
             print(f"[writer] bad script from model ({e}) — using template")
     else:
         print("[writer] no AI writer available — using template script")
-    return _finish(template_script(game))
+    return _finish(template_script(game), game)
 
 
-def _finish(s):
+def _finish(s, game=None):
     tags = " ".join("#" + h.lstrip("#").replace(" ", "") for h in s.get("hashtags", []))
-    s["full_caption"] = f"{s['caption']}\n\n{DISCLAIMER}\n\n{tags}".strip()
+    asof = ""
+    lines = ((game or {}).get("facts") or {}).get("sportsbook_lines")
+    if lines:
+        try:
+            from zoneinfo import ZoneInfo
+            import datetime as _dt
+            t = _dt.datetime.fromisoformat(lines["as_of"]).astimezone(ZoneInfo("America/Chicago"))
+            asof = f"\n\nOdds as of {t:%-I:%M%p} CT — lines move, always shop around."
+        except Exception:
+            pass
+    s["full_caption"] = f"{s['caption']}{asof}\n\n{DISCLAIMER}\n\n{tags}".strip()
     return s
 
 
@@ -247,12 +266,22 @@ def template_script(g):
     cta_vo = ("Laying the puck line or taking the dog? Comment, and follow for more." if hockey
               else "Laying it or taking the points? Comment, and follow for more.")
     matchup_vo = f"{a['short']} at {h['short']}, {when}. {fav}" + (f", total {total:g}." if total else ".")
+    books_scene = None
+    lines = (g.get("facts") or {}).get("sportsbook_lines") or {}
+    if lines.get("books_disagree"):
+        fav_side = "best_home" if lines.get("home_favored") else "best_away"
+        dog_side = "best_away" if lines.get("home_favored") else "best_home"
+        fv, dg = lines[fav_side], lines[dog_side]
+        books_scene = {"type": "books", "label": "Same game, different price",
+                       "vo": f"Same game, different price. Best number on the favorite is {fv['spread']:+g} at {fv['book']}. "
+                             f"Best on the dog is {dg['spread']:+g} at {dg['book']}. Shop every book."}
     return {
         "scenes": [
             {"type": "hook", "vo": f"Everyone's on the {h['short']} {when}. The number says something else.",
              "text": "The number is lying", "accent": "lying"},
             {"type": "matchup", "vo": matchup_vo},
             {"type": "number", "vo": num_vo, "label": label},
+            *([books_scene] if books_scene else []),
             {"type": "point", "vo": "Books don't set lines to predict games. They set them to split money.",
              "eyebrow": "The trap", "text": "Lines follow the money"},
             {"type": "point", "vo": "Stop asking who wins. Ask if the price is wrong.",
