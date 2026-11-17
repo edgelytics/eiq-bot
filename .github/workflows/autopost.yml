@@ -1,0 +1,92 @@
+name: EIQ auto-post
+
+on:
+  schedule:
+    # Fires at :10 past the hour in both CST and CDT so the 11:30 / 4:30 / 7:30 Central slots
+    # always get a run ~20 min early. gate.py skips the runs that don't match a slot.
+    - cron: "10 0,1,16,17,21,22 * * *"
+  workflow_dispatch:
+    inputs:
+      slot:
+        description: "Force a slot (midday / afternoon / primetime)"
+        required: false
+      post_now:
+        description: "Post immediately (true/false)"
+        default: "false"
+      dry_run:
+        description: "Build only, don't post (true/false)"
+        default: "true"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: eiq-autopost
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      IG_USER_ID: ${{ secrets.IG_USER_ID }}
+      IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+      PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      AUTOPOST: ${{ vars.AUTOPOST || 'true' }}      # repo variable = your kill switch
+      DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Is a slot coming up?
+        id: gate
+        run: |
+          if [ -n "${{ github.event.inputs.slot }}" ]; then echo "slot=${{ github.event.inputs.slot }}" >> $GITHUB_OUTPUT
+          else echo "slot=$(python gate.py)" >> $GITHUB_OUTPUT; fi
+
+      - name: Install
+        if: steps.gate.outputs.slot != ''
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-inter fonts-liberation
+          pip install -q -r requirements.txt
+
+      - name: Cache voice model
+        if: steps.gate.outputs.slot != ''
+        uses: actions/cache@v4
+        with:
+          path: models
+          key: kokoro-v1.0-int8
+
+      - name: Download voice model
+        if: steps.gate.outputs.slot != ''
+        run: |
+          mkdir -p models
+          [ -f models/kokoro-v1.0.int8.onnx ] || curl -sSL -o models/kokoro-v1.0.int8.onnx https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.int8.onnx
+          [ -f models/voices-v1.0.bin ] || curl -sSL -o models/voices-v1.0.bin https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin
+
+      - name: Scan, build, wait, post
+        if: steps.gate.outputs.slot != ''
+        run: |
+          ARGS="--slot ${{ steps.gate.outputs.slot }}"
+          [ "${{ github.event.inputs.post_now }}" = "true" ] && ARGS="$ARGS --now"
+          python run_slot.py $ARGS
+
+      - name: Save state
+        if: steps.gate.outputs.slot != '' && always()
+        run: |
+          git config user.name "eiq-bot"; git config user.email "eiq-bot@users.noreply.github.com"
+          git add state/ && git commit -m "bot: post log" || true
+          git push || true
+
+      - name: Keep the videos (7 days)
+        if: steps.gate.outputs.slot != '' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reels-${{ github.run_id }}
+          path: out/
+          retention-days: 7
