@@ -59,6 +59,7 @@ Return ONLY valid JSON (omit the "books" scene if the books don't disagree):
 }}"""
 
 MUSIC_PROMPT = """Pick the best background track for an Instagram Reel about sports betting.
+The list is Instagram's trending chart, most popular first — prefer higher-ranked tracks when they fit.
 Reel vibe: {mood}. Reel topic: {topic}. It sits UNDER a voiceover, so pick something energetic,
 modern and confident (hype, trap, phonk, cinematic, drill, bass-heavy). Never pick anything calm,
 sad, sleepy, romantic, childish, holiday, acoustic or comedic.
@@ -229,8 +230,15 @@ def pick_music(script, tracks, min_ms):
         if t.get("audio_id") and t["audio_id"] not in seen:
             seen.add(t["audio_id"]); uniq.append(t)
     long_enough = [t for t in uniq if (t.get("duration_in_ms") or 0) >= min_ms] or uniq
-    scored = sorted(((_music_score(t, i), t) for i, t in enumerate(long_enough)), key=lambda x: x[0], reverse=True)
-    ok = [t for s, t in scored if s > -3]          # anything that hit a calm word is out
+    # 1st choice: Instagram's trending chart (kept in its own popularity order), minus calm/novelty tracks.
+    trending = [t for t in long_enough if t.get("_src") == "trending" and _music_score(t, 0) > -3]
+    if trending:
+        ok = trending[:20]
+        print(f"[writer] choosing from {len(ok)} trending tracks")
+    else:
+        scored = sorted(((_music_score(t, i), t) for i, t in enumerate(long_enough)), key=lambda x: x[0], reverse=True)
+        ok = [t for s, t in scored if s > -3]          # anything that hit a calm word is out
+        print(f"[writer] no usable trending tracks — choosing from {len(ok)} searched tracks")
     if not ok:
         return None
     if len(ok) > 1:
