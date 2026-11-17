@@ -15,6 +15,7 @@ from config import IG_USER_ID, IG_TOKEN, GRAPH_VERSION
 
 G = f"https://graph.facebook.com/{GRAPH_VERSION}"
 PATH = pathlib.Path("state/metrics.json")
+INS_ERR = []
 REEL_METRICS = ["views", "reach", "saved", "shares", "total_interactions"]
 
 
@@ -33,10 +34,12 @@ def _insights(mid):
     while metrics:
         try:
             j = _get(f"{G}/{mid}/insights", metric=",".join(metrics))
-            return {d["name"]: (d.get("values") or [{}])[0].get("value", 0) for d in j.get("data", [])}
+            return {d["name"]: (d.get("total_value") or (d.get("values") or [{}])[0]).get("value", 0)
+                    for d in j.get("data", [])}
         except RuntimeError as e:
             bad = next((m for m in metrics if m in str(e)), None)
             if not bad:
+                INS_ERR.append(str(e)[:200])
                 return {}
             metrics.remove(bad)
     return {}
@@ -65,6 +68,8 @@ def collect():
                 "shares": ins.get("shares", 0), "interactions": ins.get("total_interactions", 0),
             })
         out["media"] = rows
+        if INS_ERR and not any(r["views"] or r["reach"] for r in rows):
+            out["error"] = "Reel views unavailable: " + INS_ERR[0]
 
         snap = {"t": now.isoformat(), "followers": out["account"].get("followers_count"),
                 "views": sum(r["views"] for r in rows), "likes": sum(r["likes"] for r in rows)}
