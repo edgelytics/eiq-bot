@@ -7,6 +7,36 @@ from enrich import espn_facts, book_lines
 import config
 
 out = {"games": []}
+
+# --- key diagnostics: shape of the saved secret (never the key itself) + every auth style ---
+import os, re, requests
+_raw_key = os.environ.get("ODDSPAPI_KEY") or ""
+try:
+    import oddspapi as _op
+    _k = _op.KEY or ""
+except Exception:
+    _k = _raw_key.strip()
+out["key_info"] = {
+    "saved_length": len(_raw_key), "cleaned_length": len(_k),
+    "has_space_inside": " " in _k, "had_newline": "\n" in _raw_key or "\r" in _raw_key,
+    "char_types": "".join(sorted(set("a" if c.isalpha() else "9" if c.isdigit() else c for c in _k))),
+    "looks_labelled": bool(re.match(r"(?i)\s*(x-)?api.?key\s*[:=]", _k)),
+}
+_probes = {}
+for name, url, params, headers in [
+    ("v5 header", "https://v5.oddspapi.io/en/sports", {}, {"X-API-Key": _k}),
+    ("v5 query", "https://v5.oddspapi.io/en/sports", {"apiKey": _k}, {}),
+    ("v4 query", "https://api.oddspapi.io/v4/sports", {"apiKey": _k}, {}),
+    ("v4 header", "https://api.oddspapi.io/v4/sports", {}, {"X-API-Key": _k}),
+]:
+    try:
+        r = requests.get(url, params=params, headers=headers, timeout=20)
+        _probes[name] = f"{r.status_code} {r.text[:90]}"
+    except Exception as e:
+        _probes[name] = f"error {e}"
+    import time; time.sleep(2.2)
+out["auth_probes"] = _probes
+print(json.dumps({"key_info": out["key_info"], "auth_probes": _probes}, indent=1))
 try:
     import oddspapi
     oddspapi._version()
