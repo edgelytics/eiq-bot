@@ -3,7 +3,8 @@ enrich.py — real facts for the script, so videos say valid things.
 
   ESPN game summary (free, no key):  ESPN Analytics win probability, ATS records,
                                      injury report, latest news headlines, open/close line
-  The Odds API (free, ODDS_API_KEY): live spreads/totals at DraftKings, FanDuel, BetMGM, Caesars...
+  OddsPapi (ODDSPAPI_KEY):           live spreads/totals at DraftKings, FanDuel, BetMGM, Caesars... (preferred)
+  The Odds API (ODDS_API_KEY):       same, used only if OddsPapi isn't set up or fails
   Our own snapshots (state file):    how the consensus line has moved since we first saw it
 """
 import datetime as dt
@@ -22,7 +23,8 @@ BOOK_NAMES = {"draftkings": "DraftKings", "fanduel": "FanDuel", "betmgm": "BetMG
               "williamhill_us": "Caesars", "espnbet": "ESPN BET", "fanatics": "Fanatics",
               "betrivers": "BetRivers", "bet365": "bet365", "hardrockbet": "Hard Rock",
               "ballybet": "Bally Bet", "betonlineag": "BetOnline", "bovada": "Bovada", "lowvig": "LowVig"}
-PREFERRED = ["draftkings", "fanduel", "betmgm", "williamhill_us", "espnbet", "fanatics", "bet365", "betrivers"]
+PREFERRED = ["draftkings", "fanduel", "betmgm", "williamhill_us", "caesars", "williamhill", "espnbet", "fanatics",
+             "bet365", "thescore", "betrivers", "hardrockbet", "circa"]   # US books, shown first
 
 
 def _get(url):
@@ -124,8 +126,36 @@ def _match(ev, game):
     return (eh == h or last(eh) == last(h)) and (ea == a or last(ea) == last(a))
 
 
-def book_lines(game):
-    """Spread + total at each US book for this game. Costs 2 credits (spreads + totals, 1 region)."""
+def book_lines(game, espn_home_line=None):
+    """Spread + total at each book for this game: OddsPapi first, The Odds API as backup."""
+    rows = None
+    try:
+        import oddspapi
+        rows = oddspapi.book_lines(game)
+        if rows:
+            print("[enrich] lines from OddsPapi")
+    except Exception as e:
+        print(f"[enrich] OddsPapi failed: {e}")
+    if not rows:
+        rows = _odds_api_rows(game)
+    if not rows:
+        return None
+    # sanity check the sign against ESPN's line (guards against a home/away mix-up)
+    try:
+        espn = float(str(espn_home_line).replace("+", "")) if espn_home_line not in (None, "") else None
+    except ValueError:
+        espn = None
+    med = statistics.median(r["home_spread"] for r in rows)
+    if espn and med and abs(espn) >= 1 and (espn > 0) != (med > 0) and abs(abs(espn) - abs(med)) < 3:
+        print(f"[enrich] flipping spread sign (ESPN {espn:+g} vs books {med:+g})")
+        for r in rows:
+            r["home_spread"], r["away_spread"] = r["away_spread"], r["home_spread"]
+            r["home_price"], r["away_price"] = r.get("away_price"), r.get("home_price")
+    return _summarise(rows)
+
+
+def _odds_api_rows(game):
+    """Backup source. Costs 2 credits (spreads + totals, 1 region)."""
     if not ODDS_KEY or game["league"] not in ODDS_SPORT:
         return None
     try:
@@ -159,8 +189,13 @@ def book_lines(game):
                         row["total"], row["over_price"] = o.get("point"), o.get("price")
         if row.get("home_spread") is not None:
             rows.append(row)
-    if not rows:
-        return None
+    return rows or None
+
+
+def _summarise(rows):
+    us = [r for r in rows if r["key"] in PREFERRED]
+    if len(us) >= 3:          # viewers can only bet US books, so compare those when we have enough
+        rows = us
     rows.sort(key=lambda r: PREFERRED.index(r["key"]) if r["key"] in PREFERRED else 99)
     spreads = [r["home_spread"] for r in rows]
     consensus = statistics.median(spreads)
@@ -202,7 +237,7 @@ def track_line(state, game, lines):
 
 def enrich(game, state):
     facts = espn_facts(game)
-    lines = book_lines(game)
+    lines = book_lines(game, (facts.get("espn_line_open_vs_now") or {}).get("home_now"))
     if lines:
         facts["sportsbook_lines"] = lines
         mv = track_line(state, game, lines)
