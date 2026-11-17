@@ -1,6 +1,7 @@
 {
   "games": {
-    "NHL-401892737": "2026-11-16"
+    "NHL-401892737": "2026-11-16",
+    "NBA-401910004": "2026-11-17"
   },
   "posts": [
     {
@@ -10,6 +11,15 @@
       "media_id": "18376914250301450",
       "permalink": "https://www.instagram.com/reel/Df086IKj9dl/",
       "audio": "November Magic \u2014 Peaceful Reveries"
+    },
+    {
+      "date": "2026-11-17",
+      "slot": "midday",
+      "game": "NBA-401910004",
+      "hook": "Never chase moving lines",
+      "media_id": "18098279555678467",
+      "permalink": "https://www.instagram.com/reel/Df2nMJHjh1z/",
+      "audio": "What's Up Been A Minute \u2014 DRILLTECHANTS"
     }
   ],
   "broll_used": [
@@ -20,6 +30,10 @@
     "px30940",
     "px238029",
     "px30938",
-    "px43593"
+    "px43593",
+    "px327246",
+    "px202104",
+    "px230749",
+    "px202102"
   ]
 }
