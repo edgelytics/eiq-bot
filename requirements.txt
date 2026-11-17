@@ -1,0 +1,6 @@
+anthropic
+Pillow
+numpy
+soundfile
+requests
+kokoro-onnx
