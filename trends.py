@@ -110,6 +110,24 @@ def score(g, now=None):
     return round(s, 4)
 
 
+def when_label(start_iso, tz="America/Chicago"):
+    """'tonight' / 'today' / 'tomorrow' / 'tomorrow night' / weekday name, from the game's start time."""
+    from zoneinfo import ZoneInfo
+    try:
+        z = ZoneInfo(tz)
+        start = dt.datetime.fromisoformat(start_iso.replace("Z", "+00:00")).astimezone(z)
+        now = dt.datetime.now(z)
+        days = (start.date() - now.date()).days
+        night = start.hour >= 17
+        if days <= 0:
+            return "tonight" if night else "today"
+        if days == 1:
+            return "tomorrow night" if night else "tomorrow"
+        return start.strftime("%A") + (" night" if night else "")
+    except Exception:
+        return "tonight"
+
+
 def get_trending(leagues, exclude_ids=(), top_n=5):
     games = []
     for lg in leagues:
@@ -120,6 +138,7 @@ def get_trending(leagues, exclude_ids=(), top_n=5):
     games = [g for g in games if g["id"] not in set(exclude_ids) and g["away"] and g["home"]]
     for g in games:
         g["trend_score"] = score(g)
+        g["when"] = when_label(g["start"])
     games.sort(key=lambda g: g["trend_score"], reverse=True)
     return games[:top_n]
 
