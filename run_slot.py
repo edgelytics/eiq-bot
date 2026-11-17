@@ -18,6 +18,7 @@ import config
 from trends import get_trending, SAMPLE_GAME
 from writer import write_script, pick_music
 from build import build_reel
+from enrich import enrich
 
 STATE = "state/posted.json"
 
@@ -90,16 +91,24 @@ def main():
         game = games[0]
     print(f"[run] game: {game['away']['abbr']} @ {game['home']['abbr']} ({game['league']}, score {game.get('trend_score')})")
 
-    # 2) write + build
+    # 2) real facts: ESPN analytics/injuries/ATS/news + prices across sportsbooks
     game.setdefault("when", "tonight")
+    if not a.sample:
+        try:
+            enrich(game, state)
+        except Exception as e:
+            print(f"[run] enrich failed ({e}) — continuing without extra facts")
+
+    # 3) write + build
     recent_hooks = [p.get("hook") for p in state["posts"][-12:] if p.get("hook")]
     script = write_script(game, slot["angle"], recent_hooks)
     base = f"out/{today}_{slot['name']}_{game['away']['abbr']}_{game['home']['abbr']}"
-    outs, secs = build_reel(script, game, base)
+    outs, secs, clip_ids = build_reel(script, game, base, state.get("broll_used", []))
+    state["broll_used"] = (state.get("broll_used", []) + clip_ids)[-400:]
     with open(base + ".json", "w") as f:
         json.dump({"slot": slot, "game": game, "script": script}, f, indent=2)
 
-    # 3) pick Instagram music
+    # 4) pick Instagram music
     track = None
     if config.IG_TOKEN:   # read-only lookup, also runs on dry runs so you can see the pick
         from publish import trending_music
@@ -118,11 +127,12 @@ def main():
         except Exception as e:
             print(f"[run] Audio API unavailable ({e}) — will use built-in music bed")
 
-    # 4) wait for the slot time, then post
+    # 5) wait for the slot time, then post
     from publish import post_reel, notify
     if dry or not config.AUTOPOST:
         notify(f"🧪 **EIQ bot built a Reel (not posted)** — {slot['name']}\n🎵 {track.get('title') if track else 'built-in beat'}\n{script['full_caption'][:600]}", outs["preview"])
         print(f"[run] built {outs} — not posting (dry_run={dry}, autopost={config.AUTOPOST})")
+        save_state(state)
         return 0
 
     wait = (post_at - dt.datetime.now(tz)).total_seconds()
