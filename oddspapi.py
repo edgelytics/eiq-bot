@@ -15,7 +15,8 @@ import time
 import requests
 
 KEY = (os.environ.get("ODDSPAPI_KEY") or "").strip().strip('"').strip() or None
-BASE = "https://api.oddspapi.io/v4"
+BASE_V4 = "https://api.oddspapi.io/v4"
+BASE_V5 = "https://v5.oddspapi.io/en"     # B2B keys live here; tried automatically if v4 says the key is invalid
 SPORT_NAMES = {"NFL": "american football", "CFB": "american football",
                "NBA": "basketball", "NHL": "ice hockey"}
 TOURNEY_HINT = {"NFL": ["nfl"], "CFB": ["ncaa", "college"], "NBA": ["nba"], "NHL": ["nhl"]}
@@ -32,17 +33,64 @@ _cache = {}
 DEBUG = {}   # filled for odds_check.py so problems can be diagnosed from the repo
 
 
-def _get(path, **params):
-    """GET with the API key, respecting OddsPapi's ~1-2s per-endpoint cooldown."""
+def _raw(url, params, headers):
     wait = 2.1 - (time.time() - _last[0])
     if wait > 0:
         time.sleep(wait)
-    params["apiKey"] = KEY
-    r = requests.get(f"{BASE}/{path}", params=params, timeout=30)
+    r = requests.get(url, params=params, headers=headers, timeout=30)
     _last[0] = time.time()
+    return r
+
+
+def _version():
+    """4 or 5 — whichever API version accepts this key."""
+    if "ver" not in _cache:
+        r = _raw(f"{BASE_V5}/sports", {}, {"X-API-Key": KEY})
+        if r.status_code == 200:
+            _cache["ver"], _cache["sports"] = 5, r.json()
+        else:
+            r4 = _raw(f"{BASE_V4}/sports", {"apiKey": KEY}, {})
+            if r4.status_code != 200:
+                raise RuntimeError(f"key rejected by v5 (HTTP {r.status_code}: {r.text[:120]}) "
+                                   f"and v4 (HTTP {r4.status_code}: {r4.text[:120]})")
+            _cache["ver"], _cache["sports"] = 4, r4.json()
+        DEBUG["api_version"] = _cache["ver"]
+    return _cache["ver"]
+
+
+def _get(path, **params):
+    """GET on whichever API version the key belongs to, respecting the per-endpoint cooldown."""
+    if _version() == 5:
+        r = _raw(f"{BASE_V5}/{path}", params, {"X-API-Key": KEY})
+    else:
+        params["apiKey"] = KEY
+        r = _raw(f"{BASE_V4}/{path}", params, {})
     if r.status_code != 200:
         raise RuntimeError(f"{path} HTTP {r.status_code}: {r.text[:200]}")
     return r.json()
+
+
+def _flat_fixture(f):
+    """v5 nests names (participants.participant1Name, tournament.tournamentName); flatten to the v4 shape."""
+    p, t = f.get("participants") or {}, f.get("tournament") or {}
+    return {**f, "participant1Name": f.get("participant1Name") or p.get("participant1Name"),
+            "participant2Name": f.get("participant2Name") or p.get("participant2Name"),
+            "tournamentName": f.get("tournamentName") or t.get("tournamentName"),
+            "categoryName": f.get("categoryName") or (f.get("category") or {}).get("categoryName")}
+
+
+def _v5_odds_as_v4(odds):
+    """v5 odds: {book: {entryKey: quote{marketId, outcomeId, price...}}} -> v4 bookmakerOdds shape."""
+    out = {}
+    for book, entries in (odds.get("odds") or {}).items():
+        meta = (odds.get("bookmakers") or {}).get(book) or {}
+        mk = out.setdefault(book, {"suspended": meta.get("suspended"), "markets": {}})["markets"]
+        for q in (entries or {}).values():
+            if not isinstance(q, dict) or q.get("playerId") not in (0, "0", None):
+                continue
+            m = mk.setdefault(str(q.get("marketId")), {"outcomes": {}})
+            m["outcomes"][str(q.get("outcomeId"))] = {"players": {"0": q}}
+    return {"bookmakerOdds": out}
 
 
 def _norm(s):
@@ -73,8 +121,7 @@ def _american(p):
 
 
 def _sport_id(league):
-    if "sports" not in _cache:
-        _cache["sports"] = _get("sports")
+    _version()
     want = SPORT_NAMES[league]
     for s in _cache["sports"]:
         if _norm(s.get("sportName")) == want:
@@ -87,10 +134,12 @@ def _sport_id(league):
 
 def _markets(sport_id):
     """marketId -> {kind: 'spread'|'total', handicap, outcomes{outcomeId: name}} for full-game lines."""
-    if "markets" not in _cache:
-        _cache["markets"] = _get("markets")
+    ck = ("markets", sport_id) if _version() == 5 else "markets"
+    if ck not in _cache:
+        _cache[ck] = _get("markets", sportId=sport_id) if _version() == 5 else _get("markets")
+    _cache["markets_last"] = _cache[ck]
     out = {}
-    for m in _cache["markets"]:
+    for m in _cache[ck]:
         if m.get("sportId") != sport_id or m.get("playerProp"):
             continue
         period = _norm(m.get("period"))
@@ -118,7 +167,12 @@ def _find_fixture(game, sport_id):
     start = dt.datetime.fromisoformat(game["start"].replace("Z", "+00:00"))
     frm = (start - dt.timedelta(hours=12)).strftime("%Y-%m-%dT%H:%M:%SZ")
     to = (start + dt.timedelta(hours=12)).strftime("%Y-%m-%dT%H:%M:%SZ")
-    fx = _get("fixtures", sportId=sport_id, **{"from": frm, "to": to})
+    if _version() == 5:
+        fx = [_flat_fixture(f) for f in _get("fixtures", sportId=sport_id,
+                                             startTimeFrom=int((start - dt.timedelta(hours=12)).timestamp()),
+                                             startTimeTo=int((start + dt.timedelta(hours=12)).timestamp()))]
+    else:
+        fx = _get("fixtures", sportId=sport_id, **{"from": frm, "to": to})
     DEBUG["fixtures_sample"] = [f"{f.get('participant1Name')} v {f.get('participant2Name')} | {f.get('tournamentName')}" for f in fx[:15]]
     hints = TOURNEY_HINT[game["league"]]
     best = None
@@ -159,9 +213,12 @@ def book_lines(game):
         return None
     mk = _markets(sid)
     DEBUG["sport_markets_sample"] = [{k: m.get(k) for k in ("marketId", "marketName", "marketType", "handicap", "period")}
-                                     for m in _cache["markets"] if m.get("sportId") == sid][:40]
+                                     for m in _cache["markets_last"] if m.get("sportId") == sid][:40]
     DEBUG["markets_used"] = len(mk)
-    odds = _get("odds", fixtureId=fixture["fixtureId"], oddsFormat="american")
+    if _version() == 5:
+        odds = _v5_odds_as_v4(_get("fixtures/odds", fixtureId=fixture["fixtureId"]))
+    else:
+        odds = _get("odds", fixtureId=fixture["fixtureId"], oddsFormat="american")
     DEBUG["books_raw"] = {b: list((v.get("markets") or {}))[:12] for b, v in list((odds.get("bookmakerOdds") or {}).items())[:12]}
     rows = []
     for slug, bk in (odds.get("bookmakerOdds") or {}).items():
