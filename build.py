@@ -17,7 +17,7 @@ from broll import fetch_clips
 
 LEAD = {"hook": 0.35}         # silence before the line starts (hook leaves room for the impact)
 TAIL = 0.32                   # breathing room after each line
-MIN_DUR = {"matchup": 3.4, "number": 3.6, "cta": 3.2}
+MIN_DUR = {"matchup": 3.4, "number": 3.6, "books": 4.0, "cta": 3.2}
 
 
 def build_timeline(script):
@@ -48,11 +48,12 @@ def build_audio(timeline, total):
     return post, preview
 
 
-def build_reel(script, game, base):
+def build_reel(script, game, base, used_broll=()):
     os.makedirs(os.path.dirname(base) or ".", exist_ok=True)
     timeline, total = build_timeline(script)
     post_wav, prev_wav = build_audio(timeline, total)
-    clips = fetch_clips(script.get("broll_query", "stadium lights"), n=3)
+    clips, clip_ids = fetch_clips(script.get("broll_query", "stadium lights"), n=4,
+                                  league=(game or {}).get("league"), used=used_broll)
     print(f"[build] {total:.1f}s, {len(timeline)} scenes, b-roll clips: {len(clips)}")
 
     with tempfile.TemporaryDirectory() as td:
@@ -66,4 +67,4 @@ def build_reel(script, game, base):
                             "-c:v", "copy", "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-ac", "2",
                             "-shortest", "-movflags", "+faststart", out], check=True)
             outs[name] = out
-    return outs, total
+    return outs, total, clip_ids
