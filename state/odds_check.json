@@ -13,11 +13,25 @@
    "debug": {}
   },
   {
-   "game": "Dallas Stars @ Vegas Golden Knights (NHL)",
-   "espn_home_line": "-1.5",
+   "game": "Charlotte Hornets @ Los Angeles Lakers (NBA)",
+   "espn_home_line": "-7.5",
    "lines": null,
    "debug": {}
   }
  ],
+ "key_info": {
+  "saved_length": 32,
+  "cleaned_length": 32,
+  "has_space_inside": false,
+  "had_newline": false,
+  "char_types": "9a",
+  "looks_labelled": false
+ },
+ "auth_probes": {
+  "v5 header": "401 {\"error\":401,\"message\":\"invalid apiKey\",\"code\":\"invalid_api_key\"}",
+  "v5 query": "401 {\"error\":401,\"message\":\"invalid apiKey\",\"code\":\"invalid_api_key\"}",
+  "v4 query": "401 {\"error\":{\"message\":\"Invalid API key\",\"code\":\"INVALID_API_KEY\",\"details\":\"The provided API",
+  "v4 header": "401 {\"error\":{\"message\":\"Missing API key\",\"code\":\"MISSING_API_KEY\",\"details\":\"Please provide a"
+ },
  "sports": "key rejected by v5 (HTTP 401: {\"error\":401,\"message\":\"invalid apiKey\",\"code\":\"invalid_api_key\"}) and v4 (HTTP 401: {\"error\":{\"message\":\"Invalid API key\",\"code\":\"INVALID_API_KEY\",\"details\":\"The provided API key is invalid or does not ex)"
 }
