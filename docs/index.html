@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>EIQ Command Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800;900&display=swap" rel="stylesheet">
+<style>
+/* VOICE: a sportsbook trading desk — calm, dense, exact.
+   IDEA: the board a line-manager watches: next post clock, the numbers, the switches.
+   PICTURE: the live countdown + controls as the hero; followers line under it.
+   COLOUR/TYPE: EIQ black with the brand green, one red for alarms; Inter 900 for figures.
+   LAYOUT: one column on phones; two on desktop (main + side rail). */
+:root{--bg:#070707;--panel:#111312;--line:#232624;--ink:#f2f4f3;--dim:#9aa19d;--green:#16a34a;--lime:#4ade80;--red:#ef4444;--amber:#f59e0b}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,sans-serif;overflow-x:clip}
+a{color:inherit}
+button,select,textarea,input{font:inherit;color:inherit}
+.wrap{max-width:1240px;margin:0 auto;padding:18px max(4vw,14px) 60px}
+header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.logo{width:36px;height:36px;border-radius:9px;background:var(--green);display:grid;place-items:center;font-weight:900;color:#04130a}
+h1{font-size:20px;margin:0;font-weight:800;letter-spacing:-.01em}
+.sub{color:var(--dim);font-size:13px}
+.grow{flex:1}
+.pill{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:99px;border:1px solid var(--line);font-size:13px;font-weight:600;white-space:nowrap}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--dim)}
+.on .dot{background:var(--lime);box-shadow:0 0 0 4px #4ade8022}.off .dot{background:var(--red)}
+.btn{min-height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--line);background:#181b19;cursor:pointer;font-weight:600;white-space:nowrap}
+.btn:hover{border-color:#3a3f3c}.btn:focus-visible,select:focus-visible,textarea:focus-visible,input:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+.btn.go{background:var(--green);border-color:var(--green);color:#04130a}
+.btn.warn{color:var(--red)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;margin-top:18px}
+@media(max-width:960px){.grid{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+.card h2{font-size:15px;margin:0 0 12px;font-weight:700}
+.hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:22px;align-items:center}
+@media(max-width:700px){.hero{grid-template-columns:minmax(0,1fr)}}
+.clock{font-weight:900;font-size:clamp(44px,8vw,76px);line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.slots{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.slot{padding:8px 12px;border-radius:10px;border:1px solid var(--line);font-size:13px}
+.slot b{display:block;font-size:15px}
+.slot.done{border-color:#16a34a66;background:#16a34a14}.slot.next{border-color:var(--lime)}
+.ctl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.ctl select{grid-column:1/-1;min-height:44px;border-radius:10px;background:#181b19;border:1px solid var(--line);padding:0 12px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:18px}
+@media(max-width:700px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi .v{font-size:clamp(26px,4vw,34px);font-weight:900;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.kpi .l{color:var(--dim);font-size:13px}.up{color:var(--lime)}.down{color:var(--red)}
+.fig{position:relative;height:220px}.fig svg{position:absolute;inset:0;width:100%;height:100%}
+.tip{position:absolute;pointer-events:none;background:#000;border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:12px;display:none;white-space:nowrap}
+.tabs{display:flex;gap:6px;margin-bottom:12px}
+.tab{padding:7px 14px;border-radius:99px;border:1px solid var(--line);background:none;cursor:pointer;font-weight:600;font-size:13px;min-height:36px}
+.tab[aria-selected=true]{background:var(--ink);color:var(--bg)}
+.row{display:flex;gap:12px;align-items:center;padding:11px 0;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.thumb{width:48px;height:64px;border-radius:7px;background:#1c201e center/cover;flex:none}
+.row .t{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .m{color:var(--dim);font-size:12.5px}
+.nums{margin-left:auto;text-align:right;font-variant-numeric:tabular-nums;font-size:13px;white-space:nowrap}
+.alert{display:flex;gap:10px;padding:10px 12px;border-radius:10px;background:#1a1d1b;margin-bottom:8px;font-size:13.5px}
+.alert i{flex:none;width:8px;height:8px;border-radius:50%;margin-top:6px;background:var(--amber)}
+.alert.bad i{background:var(--red)}.alert.ok i{background:var(--lime)}
+.alert a{font-weight:600}
+textarea{width:100%;min-height:96px;border-radius:10px;background:#0b0d0c;border:1px solid var(--line);padding:10px;font-size:16px;resize:vertical}
+.dock{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.app{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px;border-radius:12px;border:1px solid var(--line);text-decoration:none;font-size:12px;text-align:center}
+.app:hover{border-color:#3a3f3c}
+.app span{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-weight:900;font-size:14px;color:#fff}
+.side{display:flex;flex-direction:column;gap:18px}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:600;display:none;max-width:92vw}
+dialog{background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:14px;max-width:460px;width:92vw}
+dialog::backdrop{background:#000a}
+dialog input{width:100%;min-height:44px;border-radius:10px;background:#0b0d0c;border:1px solid var(--line);padding:0 12px;font-size:16px}
+.small{font-size:12.5px;color:var(--dim)}
+.empty{color:var(--dim);font-size:13.5px;padding:8px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">IQ</div>
+    <div><h1>EIQ Command Center</h1><div class="sub" id="upd">Loading…</div></div>
+    <div class="grow"></div>
+    <span class="pill" id="botpill"><i class="dot"></i><span>Bot status…</span></span>
+    <button class="btn" id="keybtn">Connect GitHub key</button>
+  </header>
+
+  <div class="grid">
+    <main>
+      <section class="card hero" id="next">
+        <div>
+          <div class="sub" id="nextlabel">Next post</div>
+          <div class="clock" id="clock">--:--:--</div>
+          <div class="slots" id="slots"></div>
+        </div>
+        <div class="ctl">
+          <select id="slotsel" aria-label="Slot">
+            <option value="midday">Midday · 11:30 CT</option>
+            <option value="afternoon">Afternoon · 4:30 CT</option>
+            <option value="primetime">Primetime · 7:30 CT</option>
+          </select>
+          <button class="btn go" data-act="post">Post now</button>
+          <button class="btn" data-act="test">Test video</button>
+          <button class="btn" data-act="metrics">Refresh stats</button>
+          <button class="btn" data-act="pause" id="pausebtn">Pause bot</button>
+        </div>
+      </section>
+
+      <section class="kpis">
+        <div class="card kpi"><div class="l">Followers</div><div class="v" id="k-f">—</div><div class="small" id="k-fd"></div></div>
+        <div class="card kpi"><div class="l">Reel views (last 30)</div><div class="v" id="k-v">—</div><div class="small" id="k-vd"></div></div>
+        <div class="card kpi"><div class="l">Avg views / reel</div><div class="v" id="k-a">—</div><div class="small" id="k-ad"></div></div>
+        <div class="card kpi"><div class="l">Bot posts</div><div class="v" id="k-p">—</div><div class="small" id="k-pd"></div></div>
+      </section>
+
+      <section class="card" style="margin-top:18px" id="growth">
+        <h2>Followers over time</h2>
+        <div class="fig" id="fig1"><svg></svg><div class="tip"></div></div>
+      </section>
+
+      <section class="card" style="margin-top:18px" id="perreel">
+        <h2>Views per reel</h2>
+        <div class="fig" id="fig2" style="height:200px"><svg></svg><div class="tip"></div></div>
+      </section>
+
+      <section class="card" style="margin-top:18px" id="activity">
+        <div class="tabs" role="tablist">
+          <button class="tab" role="tab" aria-selected="true" data-tab="posts">Posts</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="runs">Bot runs</button>
+        </div>
+        <div id="list"></div>
+      </section>
+    </main>
+
+    <aside class="side">
+      <section class="card" id="needs"><h2>Needs your attention</h2><div id="alerts"></div></section>
+      <section class="card" id="teach">
+        <h2>Teach the bot</h2>
+        <textarea id="idea" placeholder="e.g. Do more NBA player-prop explainers on Tuesdays"></textarea>
+        <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
+          <button class="btn go" data-act="teach">Add to playbook</button>
+          <a class="small" href="https://github.com/edgelytics/eiq-bot/blob/main/playbook.md">See playbook</a>
+        </div>
+      </section>
+      <section class="card" id="apps"><h2>Everything Edgelytics</h2><div class="dock" id="dock"></div></section>
+    </aside>
+  </div>
+</div>
+
+<dialog id="keydlg">
+  <form method="dialog" id="keyform">
+    <h2 style="margin-top:0">Connect your GitHub key</h2>
+    <p class="small">The buttons need a fine-grained GitHub token for <b>edgelytics/eiq-bot</b> with <b>Actions</b>, <b>Contents</b> and <b>Variables</b> set to Read and write. It's saved only in this browser and only ever sent to api.github.com.</p>
+    <input id="keyin" type="password" autocomplete="off" placeholder="github_pat_…">
+    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+      <button class="btn go" value="save">Save</button>
+      <button class="btn" value="cancel">Cancel</button>
+      <button class="btn warn" value="forget">Forget key</button>
+    </div>
+  </form>
+</dialog>
+<div class="toast" id="toast"></div>
+
+<script>
+{
+const R = "edgelytics/eiq-bot", API = "https://api.github.com/repos/" + R;
+const RAW = "https://raw.githubusercontent.com/" + R + "/main/";
+const TZ = "America/Chicago", IG_TOKEN_EXPIRES = "2027-01-15";
+const SLOTS = [["midday","11:30"],["afternoon","16:30"],["primetime","19:30"]];
+const APPS = [
+  ["Instagram","https://www.instagram.com/edgelytics.iq/","#e1306c","IG"],
+  ["Website","https://edgelytics.github.io/edgelytics-site/","#16a34a","W"],
+  ["Bot code","https://github.com/edgelytics/eiq-bot","#333","GH"],
+  ["Runs","https://github.com/edgelytics/eiq-bot/actions","#2563eb","▶"],
+  ["Scheduler","https://console.cron-job.org/jobs","#0ea5e9","⏱"],
+  ["Playbook","https://github.com/edgelytics/eiq-bot/edit/main/playbook.md","#7c3aed","PB"],
+  ["Meta app","https://developers.facebook.com/apps/","#1877f2","M"],
+  ["FB Page","https://business.facebook.com/","#1877f2","FB"],
+  ["Gemini","https://aistudio.google.com/","#f59e0b","G"],
+  ["Footage","https://pixabay.com/videos/","#22c55e","PX"],
+  ["Odds","https://oddspapi.io/","#ef4444","$"],
+  ["Secrets","https://github.com/edgelytics/eiq-bot/settings/secrets/actions","#475569","🔑"]];
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = n => n == null ? "—" : n >= 1e6 ? (n/1e6).toFixed(1)+"M" : n >= 1e4 ? (n/1e3).toFixed(1)+"K" : Number(n).toLocaleString();
+let key = ""; try { key = localStorage.getItem("eiq_pat") || ""; } catch (e) {}
+let S = { posted: null, metrics: null, runs: [], autopost: null };
+let tab = "posts";
+
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.style.display="block"; clearTimeout(t._h); t._h=setTimeout(()=>t.style.display="none",4200); }
+async function gh(path, opt = {}) {
+  const h = { Accept: "application/vnd.github+json" };
+  if (key) h.Authorization = "Bearer " + key;
+  const r = await fetch(API + path, { ...opt, headers: { ...h, ...(opt.headers || {}) } });
+  if (!r.ok && r.status !== 404) throw new Error("GitHub " + r.status + (r.status === 401 || r.status === 403 ? " — check your key's permissions" : ""));
+  return r.status === 204 ? {} : r.status === 404 ? null : r.json();
+}
+const b64d = s => decodeURIComponent(escape(atob(s.replace(/\n/g, ""))));
+const b64e = s => btoa(unescape(encodeURIComponent(s)));
+async function readJSON(file) {
+  try {
+    if (key) { const j = await gh("/contents/" + file + "?ref=main"); return j ? JSON.parse(b64d(j.content)) : null; }
+    const r = await fetch(RAW + file + "?t=" + Date.now()); return r.ok ? r.json() : null;
+  } catch (e) { return null; }
+}
+
+// ---------- clock / slots (Central time) ----------
+function ctParts(d = new Date()) {
+  const p = Object.fromEntries(new Intl.DateTimeFormat("en-US", { timeZone: TZ, hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit" }).formatToParts(d).map(x => [x.type, x.value]));
+  return { date: `${p.year}-${p.month}-${p.day}`, secs: +p.hour * 3600 + +p.minute * 60 + +p.second };
+}
+function tickClock() {
+  const { date, secs } = ctParts();
+  const done = new Set((S.posted?.posts || []).filter(p => p.date === date).map(p => p.slot));
+  let next = SLOTS.find(([n, t]) => { const [h, m] = t.split(":"); return h * 3600 + m * 60 > secs; });
+  let wait = next ? (next[1].split(":")[0] * 3600 + next[1].split(":")[1] * 60 - secs) : (86400 - secs + 11.5 * 3600);
+  if (!next) next = SLOTS[0];
+  const hh = String(Math.floor(wait / 3600)).padStart(2, "0"), mm = String(Math.floor(wait % 3600 / 60)).padStart(2, "0"), ss = String(wait % 60).padStart(2, "0");
+  $("#clock").textContent = `${hh}:${mm}:${ss}`;
+  if (!$("#slotsel").dataset.touched) $("#slotsel").value = next[0];
+  $("#nextlabel").textContent = `Next post · ${next[0]} at ${to12(next[1])} CT` + (wait <= 1200 ? " · scanning now" : "");
+  $("#slots").innerHTML = SLOTS.map(([n, t]) => `<div class="slot ${done.has(n) ? "done" : n === next[0] ? "next" : ""}"><b>${to12(t)}</b>${n}${done.has(n) ? " ✓" : ""}</div>`).join("");
+}
+const to12 = t => { let [h, m] = t.split(":").map(Number); return `${(h + 11) % 12 + 1}:${String(m).padStart(2, "0")} ${h < 12 ? "AM" : "PM"}`; };
+
+// ---------- charts ----------
+function line(el, pts) {
+  const svg = el.querySelector("svg"), tip = el.querySelector(".tip");
+  const draw = () => {
+    const W = svg.clientWidth, H = svg.clientHeight, P = 34;
+    if (pts.length < 2) { svg.innerHTML = `<text x="${W/2}" y="${H/2}" fill="#9aa19d" text-anchor="middle" font-size="13">Tracking starts with the next bot run — check back after it.</text>`; return; }
+    const xs = pts.map(p => +new Date(p.t)), ys = pts.map(p => p.y);
+    const x0 = Math.min(...xs), x1 = Math.max(...xs), lo = Math.min(...ys), hi = Math.max(...ys) || 1, pad = Math.max(1, (hi - lo) * .15);
+    const X = v => P + (v - x0) / (x1 - x0 || 1) * (W - P - 10), Y = v => H - 24 - (v - lo + pad) / (hi - lo + 2 * pad) * (H - 40);
+    const d = pts.map((p, i) => (i ? "L" : "M") + X(xs[i]).toFixed(1) + "," + Y(p.y).toFixed(1)).join("");
+    svg.innerHTML = `<path d="${d}L${X(x1)},${H-24}L${X(x0)},${H-24}Z" fill="#16a34a22"/><path d="${d}" fill="none" stroke="#4ade80" stroke-width="2.5"/>
+      <text x="4" y="${Y(hi)+4}" fill="#9aa19d" font-size="11">${fmt(hi)}</text><text x="4" y="${Y(lo)+4}" fill="#9aa19d" font-size="11">${fmt(lo)}</text>
+      <text x="${P}" y="${H-6}" fill="#9aa19d" font-size="11">${new Date(x0).toLocaleDateString()}</text><text x="${W-10}" y="${H-6}" fill="#9aa19d" font-size="11" text-anchor="end">${new Date(x1).toLocaleDateString()}</text>`;
+    svg.onpointermove = e => { const r = svg.getBoundingClientRect(), mx = e.clientX - r.left; let i = 0, best = 1e9; xs.forEach((v, j) => { const dd = Math.abs(X(v) - mx); if (dd < best) { best = dd; i = j; } });
+      tip.style.display = "block"; tip.textContent = `${new Date(xs[i]).toLocaleString([], { month: "short", day: "numeric", hour: "numeric" })} · ${fmt(ys[i])}`;
+      tip.style.left = Math.min(X(xs[i]) + 8, W - 150) + "px"; tip.style.top = Math.max(Y(ys[i]) - 30, 0) + "px"; };
+    svg.onpointerleave = () => tip.style.display = "none";
+  };
+  draw(); new ResizeObserver(draw).observe(svg);
+}
+function bars(el, rows) {
+  const svg = el.querySelector("svg"), tip = el.querySelector(".tip");
+  const draw = () => {
+    const W = svg.clientWidth, H = svg.clientHeight;
+    if (!rows.length) { svg.innerHTML = `<text x="${W/2}" y="${H/2}" fill="#9aa19d" text-anchor="middle" font-size="13">No reel stats yet.</text>`; return; }
+    const max = Math.max(...rows.map(r => r.views), 1), bw = Math.min(70, (W - 10) / rows.length);
+    svg.innerHTML = rows.map((r, i) => { const h = Math.max(2, r.views / max * (H - 30)); return `<rect data-i="${i}" x="${5 + i * bw + 2}" y="${H - 18 - h}" width="${Math.max(bw - 4, 2)}" height="${h}" rx="3" fill="${i === rows.length - 1 ? "#4ade80" : "#16a34a"}"/>`; }).join("")
+      + (bw > 26 ? rows.map((r, i) => `<text x="${5 + i * bw + bw / 2}" y="${H - 4}" fill="#9aa19d" font-size="10" text-anchor="middle">${new Date(r.timestamp).getMonth()+1}/${new Date(r.timestamp).getDate()}</text>`).join("") : "");
+    svg.onpointermove = e => { const i = e.target.dataset?.i; if (i == null) { tip.style.display = "none"; return; } const r = rows[i];
+      tip.style.display = "block"; tip.textContent = `${fmt(r.views)} views · ${fmt(r.likes)} likes · ${(r.caption || "").slice(0, 40)}`;
+      tip.style.left = Math.min(5 + i * bw, W - 260) + "px"; tip.style.top = "4px"; };
+    svg.onpointerleave = () => tip.style.display = "none";
+  };
+  draw(); new ResizeObserver(draw).observe(svg);
+}
+
+// ---------- render ----------
+function render() {
+  const M = S.metrics || {}, P = S.posted || {}, posts = P.posts || [], media = M.media || [];
+  $("#upd").textContent = M.updated ? "Stats updated " + new Date(M.updated).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "Stats appear after the next bot run";
+  const hist = M.history || [], f = M.account?.followers_count;
+  $("#k-f").textContent = fmt(f);
+  const ago = h => { const t = Date.now() - h * 3600e3; return [...hist].reverse().find(p => +new Date(p.t) <= t); };
+  const d1 = ago(24); if (f != null && d1) { const d = f - d1.followers; $("#k-fd").innerHTML = `<span class="${d >= 0 ? "up" : "down"}">${d >= 0 ? "+" : ""}${d}</span> last 24h`; }
+  const reels = media.filter(m => m.type === "REELS" || m.views);
+  const tv = reels.reduce((a, m) => a + (m.views || 0), 0);
+  $("#k-v").textContent = media.length ? fmt(tv) : "—";
+  $("#k-vd").textContent = media.length ? `${fmt(reels.reduce((a, m) => a + (m.likes || 0), 0))} likes · ${fmt(reels.reduce((a, m) => a + (m.shares || 0), 0))} shares` : "";
+  $("#k-a").textContent = reels.length ? fmt(Math.round(tv / reels.length)) : "—";
+  const best = [...reels].sort((a, b) => b.views - a.views)[0]; $("#k-ad").textContent = best ? `best: ${fmt(best.views)}` : "";
+  $("#k-p").textContent = posts.length;
+  const today = ctParts().date; $("#k-pd").textContent = `${posts.filter(p => p.date === today).length} of 3 today`;
+  line($("#fig1"), hist.filter(h => h.followers != null).map(h => ({ t: h.t, y: h.followers })));
+  bars($("#fig2"), [...reels].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp)).slice(-20));
+
+  // bot pill
+  const pill = $("#botpill"), ap = S.autopost;
+  pill.className = "pill " + (ap === false ? "off" : "on");
+  pill.querySelector("span").textContent = ap === false ? "Bot paused" : ap === true ? "Bot live" : "Bot live (connect key to control)";
+  $("#pausebtn").textContent = ap === false ? "Resume bot" : "Pause bot";
+  $("#keybtn").textContent = key ? "Key connected ✓" : "Connect GitHub key";
+
+  renderList(); renderAlerts();
+}
+function renderList() {
+  document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", t.dataset.tab === tab));
+  const box = $("#list");
+  if (tab === "runs") {
+    box.innerHTML = S.runs.length ? S.runs.map(r => { const ok = r.conclusion === "success", run = r.status !== "completed";
+      return `<div class="row"><span class="dot" style="background:${run ? "#f59e0b" : ok ? "#4ade80" : "#ef4444"};flex:none"></span><div><div class="t">${esc(r.event === "workflow_dispatch" ? "Triggered run" : "Scheduled run")} · ${esc(run ? r.status : r.conclusion)}</div><div class="m">${new Date(r.created_at).toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit" })}</div></div><a class="nums" href="${esc(r.html_url)}">Open ↗</a></div>`; }).join("") : `<div class="empty">No runs loaded yet.</div>`;
+    return;
+  }
+  const media = S.metrics?.media || [], byLink = Object.fromEntries(media.map(m => [m.permalink, m]));
+  const bot = (S.posted?.posts || []).slice().reverse();
+  const botLinks = new Set(bot.map(p => p.permalink));
+  const items = bot.map(p => ({ ...p, m: byLink[p.permalink] })).concat(media.filter(m => !botLinks.has(m.permalink)).map(m => ({ m, manual: true })));
+  box.innerHTML = items.length ? items.slice(0, 25).map(it => { const m = it.m || {};
+    return `<div class="row"><div class="thumb" ${m.thumb ? `style="background-image:url('${esc(m.thumb)}')"` : ""}></div>
+      <div style="min-width:0"><div class="t">${esc(it.hook || m.caption || it.game || "Reel")}</div>
+      <div class="m">${it.manual ? "posted by you" : esc(it.date + " · " + it.slot)}${it.audio ? " · ♪ " + esc(it.audio) : ""}</div></div>
+      <div class="nums">${m.views != null ? `<b>${fmt(m.views)}</b> views<br>${fmt(m.likes)} ♥ · ${fmt(m.comments)} 💬` : `<span class="small">stats soon</span>`}<br>${it.permalink || m.permalink ? `<a href="${esc(it.permalink || m.permalink)}">View ↗</a>` : ""}</div></div>`; }).join("") : `<div class="empty">No posts yet.</div>`;
+}
+function renderAlerts() {
+  const a = [], { date, secs } = ctParts(), posts = S.posted?.posts || [];
+  const missed = SLOTS.filter(([n, t]) => { const [h, m] = t.split(":"); return secs > h * 3600 + m * 60 + 1800 && !posts.some(p => p.date === date && p.slot === n); });
+  missed.forEach(([n]) => a.push(["bad", `The ${n} post didn't go up today.`, "post:" + n, "Post it now"]));
+  const last = S.runs.find(r => r.status === "completed");
+  if (last && last.conclusion !== "success") a.push(["bad", "The last bot run failed.", last.html_url, "See what broke"]);
+  if (S.autopost === false) a.push(["warn", "The bot is paused — nothing will post.", "act:pause", "Resume"]);
+  if (S.metrics?.error) a.push(["warn", "Instagram stats error: " + S.metrics.error, null]);
+  const days = Math.round((new Date(IG_TOKEN_EXPIRES) - Date.now()) / 864e5);
+  if (days < 21) a.push([days < 7 ? "bad" : "warn", `Instagram token expires in ${days} days.`, "https://developers.facebook.com/tools/explorer/", "Renew"]);
+  if (!key) a.push(["warn", "Connect your GitHub key to use the buttons.", "act:key", "Connect"]);
+  a.push(["warn", "Live odds from multiple books: add an ODDSPAPI_KEY secret.", "https://github.com/edgelytics/eiq-bot/settings/secrets/actions", "Add key"]);
+  if (!a.some(x => x[0] === "bad")) a.unshift(["ok", "All systems normal.", null]);
+  $("#alerts").innerHTML = a.map(([k, t, href, lbl]) => `<div class="alert ${k}"><i></i><div>${esc(t)}${href ? ` <a href="${href.startsWith("http") ? esc(href) : "#"}" data-go="${esc(href)}">${esc(lbl)}</a>` : ""}</div></div>`).join("");
+}
+
+// ---------- actions ----------
+async function dispatch(inputs, label) {
+  if (!key) { openKey(); return; }
+  await gh("/actions/workflows/autopost.yml/dispatches", { method: "POST", body: JSON.stringify({ ref: "main", inputs }) });
+  toast(label + " — started. It shows under Bot runs in a few seconds.");
+  setTimeout(loadRuns, 6000); setTimeout(loadRuns, 20000);
+}
+async function act(kind, arg) {
+  try {
+    const slot = arg || $("#slotsel").value;
+    if (kind === "post") return dispatch({ slot, post_now: "true", dry_run: "false", mode: "post" }, `Posting ${slot} now`);
+    if (kind === "test") return dispatch({ slot, post_now: "true", dry_run: "true", mode: "post" }, "Test video build (not posted)");
+    if (kind === "metrics") return dispatch({ mode: "metrics" }, "Refreshing stats");
+    if (kind === "key") return openKey();
+    if (kind === "pause") {
+      if (!key) return openKey();
+      const val = S.autopost === false ? "true" : "false";
+      const ex = await gh("/actions/variables/AUTOPOST");
+      if (ex) await gh("/actions/variables/AUTOPOST", { method: "PATCH", body: JSON.stringify({ name: "AUTOPOST", value: val }) });
+      else await gh("/actions/variables", { method: "POST", body: JSON.stringify({ name: "AUTOPOST", value: val }) });
+      S.autopost = val === "true"; render(); toast(S.autopost ? "Bot resumed." : "Bot paused — it will build but not post.");
+    }
+    if (kind === "teach") {
+      if (!key) return openKey();
+      const idea = $("#idea").value.trim(); if (!idea) return toast("Type an idea first.");
+      const f = await gh("/contents/playbook.md?ref=main"); let txt = b64d(f.content);
+      const lineTxt = `- ${idea.replace(/\s+/g, " ")} _(added ${ctParts().date})_`;
+      txt = /## My ideas[^\n]*\n/.test(txt) ? txt.replace(/(## My ideas[^\n]*\n)/, `$1${lineTxt}\n`) : txt.trimEnd() + `\n\n## My ideas\n${lineTxt}\n`;
+      await gh("/contents/playbook.md", { method: "PUT", body: JSON.stringify({ message: "idea from Command Center", content: b64e(txt), sha: f.sha, branch: "main" }) });
+      $("#idea").value = ""; toast("Added — the bot uses it from the next post.");
+    }
+  } catch (e) { toast(e.message); }
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-act]"); if (b) { act(b.dataset.act); return; }
+  const g = e.target.closest("[data-go]"); if (g && !g.dataset.go.startsWith("http")) { e.preventDefault(); const [k, v] = g.dataset.go.split(":"); k === "post" ? act("post", v) : act(v); }
+  const t = e.target.closest("[data-tab]"); if (t) { tab = t.dataset.tab; renderList(); }
+});
+function openKey() { $("#keyin").value = ""; $("#keydlg").showModal(); }
+$("#keybtn").onclick = openKey;
+$("#slotsel").onchange = () => $("#slotsel").dataset.touched = 1;
+$("#keydlg").addEventListener("close", () => {
+  const v = $("#keydlg").returnValue;
+  if (v === "save" && $("#keyin").value.trim()) { key = $("#keyin").value.trim(); try { localStorage.setItem("eiq_pat", key); } catch (e) {} load(); }
+  if (v === "forget") { key = ""; try { localStorage.removeItem("eiq_pat"); } catch (e) {} S.autopost = null; render(); }
+});
+
+// ---------- load ----------
+async function loadRuns() { try { const j = await gh("/actions/runs?per_page=15"); S.runs = j?.workflow_runs || []; } catch (e) {} render(); }
+async function load() {
+  const [posted, metrics] = await Promise.all([readJSON("state/posted.json"), readJSON("state/metrics.json")]);
+  S.posted = posted; S.metrics = metrics;
+  if (key) { try { const v = await gh("/actions/variables/AUTOPOST"); S.autopost = v ? v.value !== "false" : true; } catch (e) { toast(e.message); } }
+  render(); loadRuns();
+}
+$("#dock").innerHTML = APPS.map(([n, u, c, i]) => `<a class="app" href="${u}" target="_blank" rel="noopener"><span style="background:${c}">${i}</span>${n}</a>`).join("");
+tickClock(); setInterval(tickClock, 1000);
+load(); setInterval(load, 5 * 60e3);
+}
+</script>
+</body>
+</html>
