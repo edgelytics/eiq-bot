@@ -19,5 +19,5 @@
    "debug": {}
   }
  ],
- "sports": "sports HTTP 401: {\"error\":{\"message\":\"Invalid API key\",\"code\":\"INVALID_API_KEY\",\"details\":\"The provided API key is invalid or does not exist.\"}}"
+ "sports": "key rejected by v5 (HTTP 401: {\"error\":401,\"message\":\"invalid apiKey\",\"code\":\"invalid_api_key\"}) and v4 (HTTP 401: {\"error\":{\"message\":\"Invalid API key\",\"code\":\"INVALID_API_KEY\",\"details\":\"The provided API key is invalid or does not ex)"
 }
