@@ -103,8 +103,12 @@ jobs:
         run: |
           git config user.name "eiq-bot"; git config user.email "eiq-bot@users.noreply.github.com"
           git add state/ && git commit -q -m "bot: post log + stats" || true
-          git pull --rebase -q || true
-          git push || true
+          # another run may have saved state meanwhile: rebase (keeping this run's files) and retry
+          for i in 1 2 3 4 5; do
+            git pull --rebase -X theirs -q && git push -q && break
+            git rebase --abort 2>/dev/null || true
+            sleep $((i * 5))
+          done
 
       - name: Keep the videos (7 days)
         if: steps.gate.outputs.slot != '' && always()
