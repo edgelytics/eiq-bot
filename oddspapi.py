@@ -14,7 +14,7 @@ import time
 
 import requests
 
-KEY = os.environ.get("ODDSPAPI_KEY")
+KEY = (os.environ.get("ODDSPAPI_KEY") or "").strip().strip('"').strip() or None
 BASE = "https://api.oddspapi.io/v4"
 SPORT_NAMES = {"NFL": "american football", "CFB": "american football",
                "NBA": "basketball", "NHL": "ice hockey"}
