@@ -73,7 +73,12 @@ def _pixabay(query, used, league=None):
         v = h.get("videos", {})
         f = v.get("large") if (v.get("large") or {}).get("url") else v.get("medium")
         if f and f.get("url") and (f.get("height") or 0) >= 720:
-            out.append((f"px{h['id']}", f["url"]))
+            # quality: what Pixabay users liked/downloaded, sharper files, and vertical clips (no heavy crop)
+            q = (h.get("likes", 0) * 3 + h.get("downloads", 0) / 40 + h.get("views", 0) / 3000
+                 + (40 if (f.get("height") or 0) >= 1080 else 0)
+                 + (120 if (f.get("height") or 0) > (f.get("width") or 0) else 0)
+                 + (20 if 8 <= h.get("duration", 0) <= 40 else 0))
+            out.append((f"px{h['id']}", f["url"], q))
     return out
 
 
@@ -89,7 +94,7 @@ def _pexels(query, used):
         files = [f for f in v.get("video_files", []) if (f.get("height") or 0) >= 1280 and f.get("file_type") == "video/mp4"]
         if files:
             f = min(files, key=lambda f: abs(f["height"] - 1920))
-            out.append((f"pe{v['id']}", f["link"]))
+            out.append((f"pe{v['id']}", f["link"], 0))
     return out
 
 
@@ -116,9 +121,12 @@ def fetch_clips(query, n=3, folder="cache/broll", league=None, used=()):
     if not pool and used:
         # every on-topic clip has been used before: allow repeats rather than go off-topic
         return fetch_clips(query, n, folder, league, used=())
-    random.shuffle(pool)
+    # best-quality clips first, then shuffle the top group so videos still look different
+    pool.sort(key=lambda c: c[2], reverse=True)
+    top = pool[:max(n * 3, 10)]
+    random.shuffle(top)
     paths, ids, seen = [], [], set()
-    for cid, url in pool:
+    for cid, url, _q in top:
         if cid in seen:
             continue
         seen.add(cid)
