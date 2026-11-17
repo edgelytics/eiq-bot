@@ -91,7 +91,9 @@ def main():
     print(f"[run] game: {game['away']['abbr']} @ {game['home']['abbr']} ({game['league']}, score {game.get('trend_score')})")
 
     # 2) write + build
-    script = write_script(game, slot["angle"])
+    game.setdefault("when", "tonight")
+    recent_hooks = [p.get("hook") for p in state["posts"][-12:] if p.get("hook")]
+    script = write_script(game, slot["angle"], recent_hooks)
     base = f"out/{today}_{slot['name']}_{game['away']['abbr']}_{game['home']['abbr']}"
     outs, secs = build_reel(script, game, base)
     with open(base + ".json", "w") as f:
@@ -99,10 +101,17 @@ def main():
 
     # 3) pick Instagram music
     track = None
-    if not dry and config.IG_TOKEN:
+    if config.IG_TOKEN:   # read-only lookup, also runs on dry runs so you can see the pick
         from publish import trending_music
         try:
-            tracks = trending_music()
+            tracks = []
+            for q in (None, "hype", "trap", "phonk", "sports"):
+                try:
+                    tracks += trending_music(q)
+                except Exception as e:
+                    print(f"[run] audio search {q!r} failed: {e}")
+            if not tracks:
+                raise RuntimeError("no tracks returned")
             track = pick_music(script, tracks, int(secs * 1000))
             if track:
                 print(f"[run] music: {track.get('title')} — {track.get('display_artist')}")
@@ -112,7 +121,7 @@ def main():
     # 4) wait for the slot time, then post
     from publish import post_reel, notify
     if dry or not config.AUTOPOST:
-        notify(f"🧪 **EIQ bot built a Reel (not posted)** — {slot['name']}\n{script['full_caption'][:600]}", outs["preview"])
+        notify(f"🧪 **EIQ bot built a Reel (not posted)** — {slot['name']}\n🎵 {track.get('title') if track else 'built-in beat'}\n{script['full_caption'][:600]}", outs["preview"])
         print(f"[run] built {outs} — not posting (dry_run={dry}, autopost={config.AUTOPOST})")
         return 0
 
@@ -127,7 +136,8 @@ def main():
         notify(f"⚠️ **EIQ bot failed to post** ({slot['name']}): {e}")
         raise
     state["games"][game["id"]] = str(today)
-    state["posts"].append({"date": str(today), "slot": slot["name"], "game": game["id"], **res})
+    state["posts"].append({"date": str(today), "slot": slot["name"], "game": game["id"],
+                           "hook": script["scenes"][0].get("text"), **res})
     save_state(state)
     notify(f"✅ **Posted** ({slot['name']}): {game['away']['abbr']} @ {game['home']['abbr']}\n"
            f"🎵 {res['audio']}\n{res.get('permalink') or ''}")
