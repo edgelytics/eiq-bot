@@ -17,6 +17,10 @@ from config import GREEN, BG, HANDLE, DISCLAIMER
 from broll import ClipReader
 
 W, H, FPS = 1080, 1920, 30
+# Instagram safe zone: like/comment/share buttons sit on the right, caption + username at the bottom.
+LX, RX = 80, 900            # all text/cards live between these x positions
+CX = (LX + RX) // 2         # visual center of the safe area
+CAP_Y = 1350                # captions sit above Instagram's bottom caption area
 HERE = os.path.dirname(os.path.abspath(__file__))
 WHITE = (255, 255, 255)
 GREY = (175, 175, 175)
@@ -74,6 +78,30 @@ def A(c, a):
 def reveal(t, delay, dur=0.4):
     p = ease_out((t - delay) / dur)
     return p, (1 - p) * 70
+
+
+def fit_lines(words, fname, size, maxw, max_lines=3, min_size=56):
+    """Wrap words by real pixel width; shrink the font until it fits in max_lines."""
+    while True:
+        f = font(fname, size)
+        lines, cur = [], []
+        for w in words:
+            trial = " ".join(cur + [w])
+            if cur and f.getlength(trial) > maxw:
+                lines.append(cur); cur = [w]
+            else:
+                cur.append(w)
+        lines.append(cur)
+        widest = max(f.getlength(" ".join(l)) for l in lines)
+        if (len(lines) <= max_lines and widest <= maxw) or size <= min_size:
+            return f, lines
+        size -= 6
+
+
+def fit_size(txt, fname, size, maxw, min_size=24):
+    while size > min_size and font(fname, size).getlength(txt) > maxw:
+        size -= 2
+    return font(fname, size)
 
 
 def text_img(txt, fnt, fill, stroke=6, stroke_fill=(0, 0, 0, 230)):
@@ -135,7 +163,7 @@ def vignette():
     d = np.sqrt(((xx - W / 2) / (W * 0.75)) ** 2 + ((yy - H / 2) / (H * 0.62)) ** 2)
     a = np.clip((d - 0.45) * 1.4, 0, 0.85)
     # extra darkening in caption zone + top for legibility
-    a = np.maximum(a, np.clip((yy - 1250) / 500, 0, 0.55))
+    a = np.maximum(a, np.clip((yy - (CAP_Y - 170)) / 500, 0, 0.55))
     v = np.zeros((H, W, 4), np.uint8); v[..., 3] = (a * 255).astype(np.uint8)
     return Image.fromarray(v, "RGBA")
 
@@ -149,13 +177,7 @@ def draw_hook(L, t, sc, g):
     d.text((80, 470 + off), tag, font=font(MONO, 40), fill=A(GREEN, 255 * p))
     words = sc["text"].upper().split()
     accent = (sc.get("accent") or "").upper().strip(".,!?")
-    f = font(BLACKF, 138)
-    lines, cur = [], []
-    for w in words:
-        if cur and len(" ".join(cur + [w])) > 11:
-            lines.append(cur); cur = []
-        cur.append(w)
-    lines.append(cur)
+    f, lines = fit_lines(words, BLACKF, 138, RX - LX - 20, 3)
     y = 560; k = 0
     for ln in lines:
         x = 80
@@ -170,7 +192,7 @@ def draw_hook(L, t, sc, g):
                 paste_scaled(L, im, x + jit, y + im.height / 2, sc_, min(1, q * 2), "lm")
             x += f.getlength(w + " ")
             k += 1
-        y += 150
+        y += int(f.size * 1.09)
     bar = ease_out((t - 0.15 - k * 0.13) / 0.4)
     d.rectangle([80, y + 20, 80 + int(560 * bar), y + 38], fill=A(GREEN, 255))
 
@@ -182,32 +204,36 @@ def draw_matchup(L, t, sc, g):
         p = ease_out((t - 0.05 - i * 0.18) / 0.45)
         dx = (1 - p) * (-1100 if i == 0 else 1100)
         y0 = 330 + i * 360
-        d.rounded_rectangle([80 + dx, y0, 1000 + dx, y0 + 320], radius=28, fill=A(col, 215 * p))
+        d.rounded_rectangle([LX + dx, y0, RX + dx, y0 + 320], radius=28, fill=A(col, 215 * p))
         d.rectangle([80 + dx, y0 + 24, 92 + dx, y0 + 296], fill=A(GREEN, 255 * p))
         d.text((130 + dx, y0 + 36), "AWAY" if i == 0 else "HOME", font=font(MONO, 34), fill=A(WHITE, 200 * p))
         d.text((126 + dx, y0 + 80), tm["abbr"], font=font(BLACKF, 170), fill=A(WHITE, 255 * p))
         nm = tm["short"].upper(); fs = 54
-        while fs > 30 and font(XBOLD, fs).getlength(nm) > 380:
+        while fs > 28 and font(XBOLD, fs).getlength(nm) > RX - 540 - 20:
             fs -= 2
-        d.text((600 + dx, y0 + 140 + (54 - fs) // 2), nm, font=font(XBOLD, fs), fill=A(WHITE, 255 * p))
-        d.text((600 + dx, y0 + 210), tm["record"], font=font(BOLD, 46), fill=A(WHITE, 190 * p))
+        d.text((540 + dx, y0 + 140 + (54 - fs) // 2), nm, font=font(XBOLD, fs), fill=A(WHITE, 255 * p))
+        d.text((540 + dx, y0 + 210), tm["record"], font=font(BOLD, 46), fill=A(WHITE, 190 * p))
     q = (t - 0.55) / 0.3
     if q > 0:
         im = Image.new("RGBA", (150, 150), (0, 0, 0, 0)); di = ImageDraw.Draw(im)
         di.ellipse([0, 0, 149, 149], fill=A(BG, 255), outline=A(GREEN, 255), width=6)
         di.text((75, 75), "@", font=font(BLACKF, 70), fill=A(WHITE, 255), anchor="mm")
-        paste_scaled(L, im, 540, 670, ease_back(q), 1)
+        paste_scaled(L, im, CX, 670, ease_back(q), 1)
     chips = [("PUCK LINE" if g.get("league") == "NHL" else "SPREAD", g.get("spread_text") or "PK", None), ("TOTAL", None, g.get("total"))]
     for i, (k, txt, num) in enumerate(chips):
         p, off = reveal(t, 0.8 + i * 0.15, 0.35)
         if p <= 0: continue
-        x0, y0 = 80 + i * 470, 1040 + off
-        d.rounded_rectangle([x0, y0, x0 + 450, y0 + 190], radius=26, fill=A(BG, 200 * p), outline=A(GREEN, 255 * p), width=5)
-        d.text((x0 + 34, y0 + 26), k, font=font(MONO, 34), fill=A(GREEN, 255 * p))
+        cw = (RX - LX - 20) // 2
+        x0, y0 = LX + i * (cw + 20), 1040 + off
+        d.rounded_rectangle([x0, y0, x0 + cw, y0 + 190], radius=26, fill=A(BG, 200 * p), outline=A(GREEN, 255 * p), width=5)
+        d.text((x0 + 30, y0 + 26), k, font=font(MONO, 34), fill=A(GREEN, 255 * p))
         if num is not None:
             v = num * ease_out((t - 0.8 - i * 0.15) / 0.7)
             txt = f"O/U {v:.1f}"
-        d.text((x0 + 32, y0 + 78), txt, font=font(BLACKF, 78), fill=A(WHITE, 255 * p))
+            full = f"O/U {num:.1f}"
+        else:
+            full = txt
+        d.text((x0 + 28, y0 + 78), txt, font=fit_size(full, BLACKF, 78, cw - 56), fill=A(WHITE, 255 * p))
 
 
 def draw_number(L, t, sc, g):
@@ -218,14 +244,15 @@ def draw_number(L, t, sc, g):
     fav = (g.get("spread_text") or "").split()[0] if g and g.get("spread_text") else ""
     if o is not None and n is not None and o != n:
         # ---- line movement chart: OPEN -> NOW ----
-        x0, x1, ya, yb = 140, 940, 520, 1000
-        d.rounded_rectangle([80, 440, 1000, 1240], radius=30, fill=A(BG, 170 * p), outline=A((255, 255, 255), 40 * p), width=2)
+        x0, x1, ya, yb = 130, RX - 90, 520, 1000
+        d.rounded_rectangle([LX, 440, RX, 1240], radius=30, fill=A(BG, 170 * p), outline=A((255, 255, 255), 40 * p), width=2)
         lo, hi = min(o, n) - 1.5, max(o, n) + 1.5
         Y = lambda v: ya + (v - lo) / (hi - lo) * (yb - ya)    # more negative = higher on screen
         for v in np.arange(math.ceil(lo), math.floor(hi) + 1):
             d.line([(x0, Y(v)), (x1, Y(v))], fill=A(WHITE, 28 * p), width=2)
             d.text((x1 + 10, Y(v) - 16), f"{v:+g}", font=font(MONO, 28), fill=A(GREY, 160 * p))
-        pts = [(x0, Y(o)), (x0 + 260, Y(o)), (x0 + 330, Y((o + n) / 2)), (x0 + 520, Y((o + n) / 2)), (x0 + 600, Y(n)), (x1, Y(n))]
+        span = x1 - x0
+        pts = [(x0, Y(o)), (x0 + span * .32, Y(o)), (x0 + span * .41, Y((o + n) / 2)), (x0 + span * .65, Y((o + n) / 2)), (x0 + span * .75, Y(n)), (x1, Y(n))]
         prog = ease_out((t - 0.3) / 1.4)
         seg_len = [math.dist(pts[i], pts[i + 1]) for i in range(len(pts) - 1)]
         tot = sum(seg_len) * prog; drawn = [pts[0]]
@@ -239,21 +266,21 @@ def draw_number(L, t, sc, g):
         d.ellipse([hx - pulse, hy - pulse, hx + pulse, hy + pulse], fill=A(GREEN, 90))
         d.ellipse([hx - 11, hy - 11, hx + 11, hy + 11], fill=A(WHITE, 255))
         d.text((x0, 1040), "OPEN", font=font(MONO, 34), fill=A(GREY, 255 * p))
-        d.text((x0, 1085), f"{fav} {o:+g}".strip(), font=font(BLACKF, 72), fill=A(WHITE, 255 * p))
+        d.text((x0, 1085), f"{fav} {o:+g}".strip(), font=fit_size(f"{fav} {o:+g}", BLACKF, 72, 330), fill=A(WHITE, 255 * p))
         q = (t - 1.5) / 0.35
         if q > 0:
-            d.text((600, 1040), "NOW", font=font(MONO, 34), fill=A(GREEN, 255 * min(1, q)))
-            d.text((600, 1085), f"{fav} {n:+g}".strip(), font=font(BLACKF, 72), fill=A(GREEN, 255 * min(1, q)))
+            d.text((520, 1040), "NOW", font=font(MONO, 34), fill=A(GREEN, 255 * min(1, q)))
+            d.text((520, 1085), f"{fav} {n:+g}".strip(), font=fit_size(f"{fav} {n:+g}", BLACKF, 72, RX - 540), fill=A(GREEN, 255 * min(1, q)))
             badge = text_img(f"MOVED {abs(n - o):.1f} PTS", font(BLACKF, 50), A(BG, 255), 0)
             bg = Image.new("RGBA", (badge.width + 50, badge.height + 34), A(GREEN, 255))
             bg.alpha_composite(badge, (25, 17))
-            paste_scaled(L, bg, 540, 470, ease_back(q), 1)
+            paste_scaled(L, bg, CX, 470, ease_back(q), 1)
     elif g and g["league"] in ("NFL", "CFB") and g.get("spread") is not None:
         # ---- football key-number line ----
         s = abs(g["spread"]); lo, hi = max(0, math.floor(s) - 4), math.floor(s) + 5
-        X = lambda v: 110 + (v - lo) / (hi - lo) * 860
+        X = lambda v: 110 + (v - lo) / (hi - lo) * (RX - 150)
         y = 820
-        d.line([(110, y), (970, y)], fill=A(WHITE, 160 * p), width=4)
+        d.line([(110, y), (RX - 40, y)], fill=A(WHITE, 160 * p), width=4)
         for v in range(lo, hi + 1):
             key = v in (3, 7, 10, 14)
             q = ease_out((t - 0.2 - (v - lo) * 0.05) / 0.3)
@@ -270,8 +297,8 @@ def draw_number(L, t, sc, g):
         # ---- big total / stat counter ----
         val = (g or {}).get("total") or 0
         v = val * ease_out((t - 0.1) / 0.9)
-        d.text((540, 760), f"{v:.1f}", font=font(BLACKF, 300), fill=A(WHITE, 255 * p), anchor="mm")
-        d.text((540, 960), "GAME TOTAL", font=font(MONO, 50), fill=A(GREEN, 255 * p), anchor="mm")
+        d.text((CX, 760), f"{v:.1f}", font=fit_size(f"{val:.1f}", BLACKF, 300, RX - LX), fill=A(WHITE, 255 * p), anchor="mm")
+        d.text((CX, 960), "GAME TOTAL", font=font(MONO, 50), fill=A(GREEN, 255 * p), anchor="mm")
 
 
 def draw_books(L, t, sc, g):
@@ -288,7 +315,7 @@ def draw_books(L, t, sc, g):
     dog = g["away"]["abbr"] if home_fav else g["home"]["abbr"]
     key, pkey = ("home_spread", "home_price") if home_fav else ("away_spread", "away_price")
     best = lines["best_home" if home_fav else "best_away"]
-    d.text((80, 395 + off), f"{fav} SPREAD BY BOOK", font=font(BLACKF, 66), fill=A(WHITE, 255 * p))
+    d.text((80, 395 + off), f"{fav} SPREAD BY BOOK", font=fit_size(f"{fav} SPREAD BY BOOK", BLACKF, 66, RX - LX), fill=A(WHITE, 255 * p))
     y = 520
     for i, b in enumerate(books):
         q = ease_out((t - 0.25 - i * 0.12) / 0.4)
@@ -298,19 +325,19 @@ def draw_books(L, t, sc, g):
         is_best = b["book"] == best["book"] and b.get(key) == best["spread"]
         fill = A(GREEN, 235 * q) if is_best else A(BG, 200 * q)
         txt = A(BG, 255 * q) if is_best else A(WHITE, 255 * q)
-        d.rounded_rectangle([80 + dx, y, 1000 + dx, y + 115], radius=22, fill=fill,
+        d.rounded_rectangle([LX + dx, y, RX + dx, y + 115], radius=22, fill=fill,
                             outline=None if is_best else A((255, 255, 255), 50 * q), width=2)
-        d.text((115 + dx, y + 57), b["book"].upper(), font=font(BLACKF, 50), fill=txt, anchor="lm")
+        d.text((115 + dx, y + 57), b["book"].upper(), font=fit_size(b["book"].upper(), BLACKF, 50, 440), fill=txt, anchor="lm")
         val = b.get(key)
         price = b.get(pkey)
-        d.text((800 + dx, y + 57), f"{val:+g}" if val is not None else "—", font=font(BLACKF, 62), fill=txt, anchor="rm")
+        d.text((RX - 150 + dx, y + 57), f"{val:+g}" if val is not None else "—", font=font(BLACKF, 62), fill=txt, anchor="rm")
         if price is not None:
-            d.text((960 + dx, y + 57), f"{price:+d}" if isinstance(price, int) else str(price),
+            d.text((RX - 25 + dx, y + 57), f"{price:+d}" if isinstance(price, int) else str(price),
                    font=font(MONO, 32), fill=A(BG if is_best else GREY, 255 * q), anchor="rm")
         if is_best:
             tag = text_img("BEST", font(BLACKF, 30), A(GREEN, 255), 0)
             bgt = Image.new("RGBA", (tag.width + 24, tag.height + 14), A(BG, 255)); bgt.alpha_composite(tag, (12, 7))
-            paste_scaled(L, bgt, 990 + dx, y - 4, ease_back((t - 0.9) / 0.3), q, "mm")
+            paste_scaled(L, bgt, RX - 20 + dx, y - 4, ease_back((t - 0.9) / 0.3), q, "mm")
         y += 140
     dg = lines.get("best_home" if not home_fav else "best_away") or {}
     q = ease_out((t - 1.1) / 0.4)
@@ -326,12 +353,8 @@ def draw_point(L, t, sc, g, idx):
     eb = (sc.get("eyebrow") or "").upper()
     d.rounded_rectangle([80, 470 + off, 80 + font(MONO, 40).getlength(eb) + 48, 540 + off], radius=12, fill=A(GREEN, 255 * p))
     d.text((104, 482 + off), eb, font=font(MONO, 40), fill=A(BG, 255 * p))
-    words = sc["text"].upper().split(); f = font(BLACKF, 124)
-    lines, cur = [], []
-    for w in words:
-        if cur and len(" ".join(cur + [w])) > 11: lines.append(cur); cur = []
-        cur.append(w)
-    lines.append(cur)
+    words = sc["text"].upper().split()
+    f, lines = fit_lines(words, BLACKF, 124, RX - LX - 20, 3)
     y, k = 600, 0
     for ln in lines:
         x = 80
@@ -341,7 +364,7 @@ def draw_point(L, t, sc, g, idx):
                 im = text_img(w, f, A(WHITE, 255), 6)
                 paste_scaled(L, im, x, y + (1 - q) * 60, 1, q, "lt")
             x += f.getlength(w + " "); k += 1
-        y += 140
+        y += int(f.size * 1.12)
     hb = ease_out((t - 0.1) / 0.6)
     d.rectangle([40, 600, 52, 600 + int((y - 610) * hb)], fill=A(GREEN, 255))
 
@@ -357,19 +380,19 @@ class CTA:
     def draw(self, L, t, sc, g):
         d = ImageDraw.Draw(L)
         q = (t - 0.05) / 0.35
-        paste_scaled(L, self.glow, 540, 600, ease_back(q), (0.55 + 0.35 * math.sin(t * 4)) * min(1, max(0, q)))
-        paste_scaled(L, self.logo, 540, 600, ease_back(q), min(1, max(0, q * 2)))
+        paste_scaled(L, self.glow, CX, 600, ease_back(q), (0.55 + 0.35 * math.sin(t * 4)) * min(1, max(0, q)))
+        paste_scaled(L, self.logo, CX, 600, ease_back(q), min(1, max(0, q * 2)))
         bar = ease_out((t - 0.35) / 0.5)
-        d.rectangle([540 - 260 * bar, 760, 540 + 260 * bar, 776], fill=A(GREEN, 255))
+        d.rectangle([CX - 260 * bar, 760, CX + 260 * bar, 776], fill=A(GREEN, 255))
         p, off = reveal(t, 0.45)
-        d.text((540, 860 + off), sc["text"].upper(), font=font(XBOLD, 66), fill=A(WHITE, 255 * p), anchor="mm")
+        d.text((CX, 860 + off), sc["text"].upper(), font=fit_size(sc["text"].upper(), XBOLD, 66, RX - LX), fill=A(WHITE, 255 * p), anchor="mm")
         p2, off2 = reveal(t, 0.7)
         s = 1 + 0.04 * math.sin(t * 6)
         pill = Image.new("RGBA", (560, 130), (0, 0, 0, 0)); dp = ImageDraw.Draw(pill)
         dp.rounded_rectangle([0, 0, 559, 129], radius=65, fill=A(GREEN, 255))
         dp.text((280, 65), "FOLLOW " + HANDLE.upper(), font=font(BLACKF, 40), fill=A(BG, 255), anchor="mm")
-        paste_scaled(L, pill, 540, 1010 + off2, s, p2)
-        d.text((540, 1180), DISCLAIMER, font=font(MONO, 28), fill=A(GREY, 230 * p2), anchor="mm")
+        paste_scaled(L, pill, CX, 1010 + off2, s, p2)
+        d.text((CX, 1180), DISCLAIMER, font=fit_size(DISCLAIMER, MONO, 28, RX - LX), fill=A(GREY, 230 * p2), anchor="mm")
 
 
 # ---------------- captions ----------------
@@ -401,9 +424,9 @@ def draw_caption(L, t, chunks):
             col = A(GREEN, 255) if (s <= t < e + 0.05) else A(WHITE, 255 if on else 110)
             di.text((x, 20), w, font=f, fill=col, stroke_width=8, stroke_fill=(0, 0, 0, 240))
             x += wd
-        fit = min(1.0, 980 / im.width)
+        fit = min(1.0, (RX - LX + 20) / im.width)
         pop = (0.82 + 0.18 * ease_back((t - start) / 0.14)) * fit
-        paste_scaled(L, im, W / 2, 1420, pop, 1)
+        paste_scaled(L, im, CX, CAP_Y, pop, 1)
         break
 
 
@@ -481,7 +504,7 @@ def render_video(script, game, timeline, total, out_path, broll_paths=()):
             draw_caption(U, t, chunks)
         du = ImageDraw.Draw(U)
         du.rectangle([0, 0, int(W * t / total), 9], fill=A(GREEN, 255))
-        U.alpha_composite(tag, (80, 210))
+        U.alpha_composite(tag, (80, 250))
         frame.alpha_composite(U)
 
         ff.stdin.write(frame.convert("RGB").tobytes())
