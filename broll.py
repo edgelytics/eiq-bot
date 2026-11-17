@@ -61,8 +61,8 @@ def _download(url, path):
 
 def _pixabay(query, used, league=None):
     r = requests.get("https://pixabay.com/api/videos/",
-                     params={"key": PIXABAY_KEY, "q": query, "per_page": 80, "safesearch": "true",
-                             "video_type": "film", "category": "sports"}, timeout=20)
+                     params={"key": PIXABAY_KEY, "q": query, "per_page": 120, "safesearch": "true",
+                             "video_type": "film"}, timeout=20)   # tag filter below keeps it on-topic
     r.raise_for_status()
     out = []
     for h in r.json().get("hits", []):
