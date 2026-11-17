@@ -274,6 +274,50 @@ def draw_number(L, t, sc, g):
         d.text((540, 960), "GAME TOTAL", font=font(MONO, 50), fill=A(GREEN, 255 * p), anchor="mm")
 
 
+def draw_books(L, t, sc, g):
+    """Price comparison across sportsbooks: favorite's spread at each book, best number highlighted."""
+    d = ImageDraw.Draw(L)
+    lines = ((g or {}).get("facts") or {}).get("sportsbook_lines") or {}
+    books = (lines.get("books") or [])[:5]
+    p, off = reveal(t, 0.0, 0.3)
+    d.text((80, 330 + off), (sc.get("label") or "SAME GAME, DIFFERENT PRICE").upper(), font=font(MONO, 40), fill=A(GREEN, 255 * p))
+    if not books:
+        return
+    home_fav = lines.get("home_favored", True)
+    fav = g["home"]["abbr"] if home_fav else g["away"]["abbr"]
+    dog = g["away"]["abbr"] if home_fav else g["home"]["abbr"]
+    key, pkey = ("home_spread", "home_price") if home_fav else ("away_spread", "away_price")
+    best = lines["best_home" if home_fav else "best_away"]
+    d.text((80, 395 + off), f"{fav} SPREAD BY BOOK", font=font(BLACKF, 66), fill=A(WHITE, 255 * p))
+    y = 520
+    for i, b in enumerate(books):
+        q = ease_out((t - 0.25 - i * 0.12) / 0.4)
+        if q <= 0:
+            y += 140; continue
+        dx = (1 - q) * 900
+        is_best = b["book"] == best["book"] and b.get(key) == best["spread"]
+        fill = A(GREEN, 235 * q) if is_best else A(BG, 200 * q)
+        txt = A(BG, 255 * q) if is_best else A(WHITE, 255 * q)
+        d.rounded_rectangle([80 + dx, y, 1000 + dx, y + 115], radius=22, fill=fill,
+                            outline=None if is_best else A((255, 255, 255), 50 * q), width=2)
+        d.text((115 + dx, y + 57), b["book"].upper(), font=font(BLACKF, 50), fill=txt, anchor="lm")
+        val = b.get(key)
+        price = b.get(pkey)
+        d.text((800 + dx, y + 57), f"{val:+g}" if val is not None else "—", font=font(BLACKF, 62), fill=txt, anchor="rm")
+        if price is not None:
+            d.text((960 + dx, y + 57), f"{price:+d}" if isinstance(price, int) else str(price),
+                   font=font(MONO, 32), fill=A(BG if is_best else GREY, 255 * q), anchor="rm")
+        if is_best:
+            tag = text_img("BEST", font(BLACKF, 30), A(GREEN, 255), 0)
+            bgt = Image.new("RGBA", (tag.width + 24, tag.height + 14), A(BG, 255)); bgt.alpha_composite(tag, (12, 7))
+            paste_scaled(L, bgt, 990 + dx, y - 4, ease_back((t - 0.9) / 0.3), q, "mm")
+        y += 140
+    dg = lines.get("best_home" if not home_fav else "best_away") or {}
+    q = ease_out((t - 1.1) / 0.4)
+    if dg and q > 0:
+        d.text((80, y + 10), f"BEST {dog}: {dg['spread']:+g} @ {dg['book'].upper()}", font=font(MONO, 36), fill=A(GREEN, 255 * q))
+
+
 def draw_point(L, t, sc, g, idx):
     d = ImageDraw.Draw(L)
     p, off = reveal(t, 0.0, 0.3)
@@ -375,6 +419,7 @@ def render_video(script, game, timeline, total, out_path, broll_paths=()):
         c2 = hex_rgb(game["home"]["color"]) if game else GREEN
         bg_src = GradientBG(c1, c2)
     vig = vignette()
+    shade = Image.new("RGBA", (W, H), (7, 7, 7, 105))   # extra darkening over real footage
     cta = CTA()
     all_words = [w for seg in timeline for w in seg["words"]]
     chunks = caption_chunks(all_words)
@@ -403,6 +448,7 @@ def render_video(script, game, timeline, total, out_path, broll_paths=()):
             if fr is None: fr = last_bg
             last_bg = fr
             frame = Image.fromarray(fr).convert("RGBA")
+            frame.alpha_composite(shade)
         else:
             frame = bg_src.frame(t, fi)
         frame.alpha_composite(vig)
@@ -413,6 +459,7 @@ def render_video(script, game, timeline, total, out_path, broll_paths=()):
         if typ == "hook": draw_hook(L, lt, sc, game)
         elif typ == "matchup" and game: draw_matchup(L, lt, sc, game)
         elif typ == "number": draw_number(L, lt, sc, game)
+        elif typ == "books": draw_books(L, lt, sc, game)
         elif typ == "point": draw_point(L, lt, sc, game, point_idx[id(seg)])
         elif typ == "cta": cta.draw(L, lt, sc, game)
         frame.alpha_composite(L)
