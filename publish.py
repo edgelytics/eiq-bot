@@ -45,14 +45,28 @@ def publishing_quota():
     return (j.get("data") or [{}])[0]
 
 
-def _create_container(caption, audio_id=None):
+def _create_container(caption, audio_id=None, strategy="json"):
     data = {"media_type": "REELS", "upload_type": "resumable", "caption": caption,
             "share_to_feed": "true", "access_token": IG_TOKEN}
     if audio_id:
-        data["audio_configuration"] = json.dumps({"audio_id": str(audio_id),
-                                                  "audio_volume": IG_MUSIC_VOLUME,
-                                                  "video_volume": IG_VIDEO_VOLUME})
+        conf = {"audio_id": str(audio_id), "audio_volume": IG_MUSIC_VOLUME, "video_volume": IG_VIDEO_VOLUME}
+        if strategy == "loop":
+            conf["should_loop_audio"] = True      # some tracks are shorter than the reel
+        data["audio_configuration"] = json.dumps(conf)
     return _check(requests.post(f"{G}/{IG_USER_ID}/media", data=data, timeout=60))
+
+
+def media_audio_type(mid, tries=4):
+    """MUSIC if Instagram actually attached a library song, ORIGINAL_SOUND if not (None = unknown)."""
+    for i in range(tries):
+        try:
+            j = _check(requests.get(f"{G}/{mid}", params={"fields": "media_audio_type", "access_token": IG_TOKEN}, timeout=30))
+            if j.get("media_audio_type"):
+                return j["media_audio_type"]
+        except IGError as e:
+            print(f"[publish] media_audio_type check failed: {e}")
+        time.sleep(6 * (i + 1))
+    return None
 
 
 def _upload(container, path):
@@ -88,7 +102,7 @@ def _publish(cid):
     return mid, link
 
 
-def post_reel(post_mp4, preview_mp4, caption, track=None):
+def post_reel(post_mp4, preview_mp4, caption, track=None, strategy="json"):
     """
     Try: voice/SFX video + Instagram track attached.
     If attaching music fails: post the version with our own music bed baked in.
@@ -102,11 +116,17 @@ def post_reel(post_mp4, preview_mp4, caption, track=None):
     last = None
     for path, audio_id, label in attempts:
         try:
-            c = _create_container(caption, audio_id)
+            c = _create_container(caption, audio_id, strategy)
             _upload(c, path)
             _wait_ready(c["id"])
             mid, link = _publish(c["id"])
-            return {"media_id": mid, "permalink": link, "audio": label}
+            res = {"media_id": mid, "permalink": link, "audio": label}
+            if audio_id:
+                atype = media_audio_type(mid)
+                res["audio_type"] = atype
+                res["music_attached"] = atype == "MUSIC" if atype else None
+                print(f"[publish] Instagram reports audio type: {atype} (strategy={strategy})")
+            return res
         except IGError as e:
             print(f"[publish] attempt with {label} failed: {e}")
             last = e
