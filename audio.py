@@ -9,6 +9,17 @@ from config import KOKORO_MODEL, KOKORO_VOICES, VOICE, VOICE_SPEED
 
 SR = 24000
 _kokoro = None
+_voice = VOICE
+
+
+def set_voice(v):
+    """Pick the narrator for this reel (falls back to the default if Kokoro doesn't have it)."""
+    global _voice
+    try:
+        _voice = v if v in _tts().get_voices() else VOICE
+    except Exception:
+        _voice = v or VOICE
+    return _voice
 
 
 def _tts():
@@ -39,7 +50,7 @@ def _syllables(w):
 
 def speak(text):
     """Returns (samples float32 @24k, [(word, start_s, end_s), ...])."""
-    s, sr = _tts().create(text, voice=VOICE, speed=VOICE_SPEED, lang="en-us")
+    s, sr = _tts().create(text, voice=_voice, speed=VOICE_SPEED, lang="en-us")
     s = _trim(np.asarray(s, dtype=np.float32))
     assert sr == SR
     words = text.split()
