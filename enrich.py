@@ -179,6 +179,64 @@ def _reports(game, game_articles):
     return out[:5]
 
 
+# ---------------- player props ----------------
+ESPN_SPORT = {"NBA": "basketball/nba", "NFL": "football/nfl", "NHL": "hockey/nhl", "CFB": "football/college-football"}
+
+
+def player_facts(name, league, stat="points", line=None):
+    """Real recent numbers for one player from ESPN: season average and last-10 game log for the stat."""
+    import urllib.parse
+    res = _get("https://site.web.api.espn.com/apis/common/v3/search?" +
+               urllib.parse.urlencode({"query": name, "limit": 10, "type": "player"}))
+    items = res.get("items") or res.get("results") or []
+    pid = None
+    for it in items:
+        lg = str(it.get("league") or it.get("defaultLeagueSlug") or "").lower()
+        if (it.get("displayName") or "").lower() == name.lower() and (not lg or league.lower() in lg):
+            pid = it.get("id"); break
+    if not pid and items:
+        pid = items[0].get("id")
+    if not pid:
+        print(f"[enrich] ESPN player not found: {name}")
+        return None
+    sport = ESPN_SPORT[league]
+    log = _get(f"https://site.web.api.espn.com/apis/common/v3/sports/{sport}/athletes/{pid}/gamelog")
+    names = [n.lower() for n in log.get("names", [])]
+    key = {"points": "points", "rebounds": "totalrebounds", "assists": "assists"}.get(stat, stat)
+    idx = names.index(key) if key in names else None
+    evmeta = log.get("events") or {}
+    games = []
+    for st in log.get("seasonTypes", []):
+        if "regular" not in (st.get("displayName") or "").lower():
+            continue
+        for cat in st.get("categories", []):
+            for ev in cat.get("events", []):
+                if idx is None or idx >= len(ev.get("stats", [])):
+                    continue
+                try:
+                    v = float(ev["stats"][idx])
+                except (ValueError, TypeError):
+                    continue
+                m = evmeta.get(ev.get("eventId"), {})
+                games.append({"date": (m.get("gameDate") or "")[:10], "opp": (m.get("opponent") or {}).get("abbreviation"), stat: v})
+    games.sort(key=lambda g: g["date"], reverse=True)
+    if not games:
+        print(f"[enrich] no game log for {name}")
+        return {"name": name, "espn_id": pid}
+    last = games[:10]
+    vals = [g[stat] for g in last]
+    out = {"name": name, "stat": stat, "games_this_season": len(games),
+           "season_avg": round(sum(g[stat] for g in games) / len(games), 1),
+           "last_10_avg": round(sum(vals) / len(vals), 1),
+           "last_5_avg": round(sum(vals[:5]) / len(vals[:5]), 1),
+           "last_10_games": last}
+    if line is not None:
+        out["line"] = line
+        out["went_over_line_last_10"] = f"{sum(v > line for v in vals)} of {len(vals)}"
+    print(f"[enrich] {name}: season {out['season_avg']}, last 10 {out['last_10_avg']}, over {line}: {out.get('went_over_line_last_10')}")
+    return out
+
+
 # ---------------- The Odds API ----------------
 def _match(ev, game):
     def norm(s): return (s or "").lower().replace(".", "")
