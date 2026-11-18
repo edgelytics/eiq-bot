@@ -397,6 +397,73 @@ def draw_point(L, t, sc, g, idx):
 
 
 
+def _wrap(txt, fnt, maxw, max_lines):
+    words, lines, cur = txt.split(), [], ""
+    for w in words:
+        t = (cur + " " + w).strip()
+        if fnt.getlength(t) <= maxw or not cur:
+            cur = t
+        else:
+            lines.append(cur); cur = w
+    if cur: lines.append(cur)
+    if len(lines) > max_lines:
+        lines = lines[:max_lines]
+        while lines[-1] and fnt.getlength(lines[-1] + "…") > maxw:
+            lines[-1] = lines[-1].rsplit(" ", 1)[0] if " " in lines[-1] else lines[-1][:-1]
+        lines[-1] += "…"
+    return lines
+
+
+def draw_report(L, t, sc, g):
+    """A news story on screen, styled like a screenshot of an article card. Source is credited, our own design."""
+    d = ImageDraw.Draw(L)
+    p = ease_out(t / 0.45)
+    dy = int((1 - ease_back(min(1, t / 0.5))) * 260)
+    tilt_y = 430 + dy
+    src = (sc.get("source") or "ESPN").upper()
+    # label above the card
+    lab = f"{src} REPORT"
+    lw = font(MONO, 40).getlength(lab) + 48
+    d.rounded_rectangle([LX, tilt_y - 90, LX + lw, tilt_y - 22], radius=12, fill=A(GREEN, 255 * p))
+    d.text((LX + 24, tilt_y - 80), lab, font=font(MONO, 40), fill=A(BG, 255 * p))
+    # card
+    hf, sf, mf = font(XBOLD, 64), font(REG, 38), font(BOLD, 34)
+    inner = RX - LX - 80
+    hl = _wrap(sc.get("headline", ""), hf, inner, 4)
+    sm = _wrap(sc.get("summary", ""), sf, inner, 3) if sc.get("summary") else []
+    h_ = 150 + len(hl) * 78 + (30 + len(sm) * 50 if sm else 0) + 40
+    x0, y0, x1, y1 = LX, tilt_y, RX, tilt_y + h_
+    sh = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    ImageDraw.Draw(sh).rounded_rectangle([x0 + 10, y0 + 18, x1 + 10, y1 + 18], radius=30, fill=(0, 0, 0, int(140 * p)))
+    L.alpha_composite(sh.filter(ImageFilter.GaussianBlur(16)))
+    d.rounded_rectangle([x0, y0, x1, y1], radius=30, fill=(255, 255, 255, int(250 * p)))
+    # source row: badge + name + time
+    d.ellipse([x0 + 40, y0 + 36, x0 + 104, y0 + 100], fill=(200, 16, 46, int(255 * p)))
+    d.text((x0 + 72, y0 + 68), src[0], font=font(BLACKF, 38), fill=A(WHITE, 255 * p), anchor="mm")
+    meta = " · ".join(x for x in (sc.get("byline"), sc.get("ago")) if x)
+    d.text((x0 + 124, y0 + 40), src, font=mf, fill=(20, 20, 20, int(255 * p)))
+    if meta:
+        d.text((x0 + 124, y0 + 78), meta[:42], font=font(REG, 28), fill=(110, 110, 110, int(255 * p)))
+    # headline, revealed line by line with a highlighter sweep on the first line
+    y = y0 + 140
+    for i, ln in enumerate(hl):
+        q = ease_out((t - 0.25 - i * 0.12) / 0.3)
+        if q <= 0:
+            y += 78; continue
+        if i == 0:
+            hw = hf.getlength(ln) * ease_out((t - 0.6) / 0.5)
+            if hw > 0:
+                d.rectangle([x0 + 34, y + 34, x0 + 46 + hw, y + 74], fill=GREEN + (int(150 * q),))
+        d.text((x0 + 40, y), ln, font=hf, fill=(15, 15, 15, int(255 * q)))
+        y += 78
+    if sm:
+        y += 30
+        q = ease_out((t - 0.8) / 0.4)
+        for ln in sm:
+            d.text((x0 + 40, y), ln, font=sf, fill=(85, 85, 85, int(255 * q)))
+            y += 50
+
+
 # ---------------- explainer scenes ----------------
 def am_dec(a):
     a = float(a)
@@ -646,6 +713,7 @@ def render_video(script, game, timeline, total, out_path, broll_paths=(), theme=
         elif typ == "number": draw_number(L, lt, sc, game)
         elif typ == "books": draw_books(L, lt, sc, game)
         elif typ == "point": draw_point(L, lt, sc, game, point_idx[id(seg)])
+        elif typ == "report": draw_report(L, lt, sc, game)
         elif typ == "calc": draw_calc(L, lt, sc, game)
         elif typ == "shop": draw_shop(L, lt, sc, game)
         elif typ == "cta": cta.draw(L, lt, sc, game)
