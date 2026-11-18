@@ -56,6 +56,42 @@ def _create_container(caption, audio_id=None, strategy="json"):
     return _check(requests.post(f"{G}/{IG_USER_ID}/media", data=data, timeout=60))
 
 
+def host_video(path):
+    """Put the reel at a public URL for Instagram to fetch (Meta's documented way to attach a song is video_url).
+    Inside GitHub Actions: force-push the file alone to a throwaway 'reel-tmp' branch of this (public) repo."""
+    import subprocess, tempfile, shutil
+    repo, tok = os.environ.get("GITHUB_REPOSITORY"), os.environ.get("GITHUB_TOKEN")
+    if not (repo and tok):
+        raise IGError("no GitHub hosting available (GITHUB_REPOSITORY/GITHUB_TOKEN not set)")
+    name = f"reel_{int(time.time())}.mp4"
+    d = tempfile.mkdtemp()
+    shutil.copy(path, os.path.join(d, name))
+    run = lambda *a: subprocess.run(a, cwd=d, check=True, capture_output=True, text=True)
+    run("git", "init", "-q")
+    run("git", "checkout", "-q", "--orphan", "reel-tmp")
+    run("git", "-c", "user.name=eiq-bot", "-c", "user.email=eiq-bot@users.noreply.github.com", "add", name)
+    run("git", "-c", "user.name=eiq-bot", "-c", "user.email=eiq-bot@users.noreply.github.com", "commit", "-q", "-m", "temp reel for Instagram")
+    run("git", "push", "-q", "--force", f"https://x-access-token:{tok}@github.com/{repo}.git", "HEAD:reel-tmp")
+    url = f"https://raw.githubusercontent.com/{repo}/reel-tmp/{name}"
+    for _ in range(20):                       # wait until the file is publicly reachable
+        try:
+            if requests.head(url, timeout=15).status_code == 200:
+                print(f"[publish] reel hosted at {url}")
+                return url
+        except requests.RequestException:
+            pass
+        time.sleep(3)
+    raise IGError("hosted reel never became reachable")
+
+
+def _create_container_url(caption, video_url, audio_id):
+    data = {"media_type": "REELS", "video_url": video_url, "caption": caption,
+            "share_to_feed": "true", "access_token": IG_TOKEN,
+            "audio_configuration": json.dumps({"audio_id": str(audio_id), "audio_volume": IG_MUSIC_VOLUME,
+                                               "video_volume": IG_VIDEO_VOLUME})}
+    return _check(requests.post(f"{G}/{IG_USER_ID}/media", data=data, timeout=60))
+
+
 def media_audio_type(mid, tries=4):
     """MUSIC if Instagram actually attached a library song, ORIGINAL_SOUND if not (None = unknown)."""
     for i in range(tries):
@@ -111,13 +147,22 @@ def post_reel(post_mp4, preview_mp4, caption, track=None, strategy="json"):
         raise IGError("IG_USER_ID / IG_ACCESS_TOKEN not set")
     attempts = []
     if track:
-        attempts.append((post_mp4, track.get("audio_id"), f"{track.get('title')} — {track.get('display_artist')}"))
-    attempts.append((preview_mp4, None, "built-in music bed"))
+        label = f"{track.get('title')} — {track.get('display_artist')}"
+        if strategy == "url":
+            # Meta's documented path: hosted video_url + audio_configuration
+            attempts.append(("url", post_mp4, track.get("audio_id"), label))
+        else:
+            # resumable upload (Instagram has been dropping the song this way) — keep our beat under it
+            attempts.append(("upload", preview_mp4 if strategy != "json" else post_mp4, track.get("audio_id"), label))
+    attempts.append(("upload", preview_mp4, None, "built-in music bed"))
     last = None
-    for path, audio_id, label in attempts:
+    for how, path, audio_id, label in attempts:
         try:
-            c = _create_container(caption, audio_id, strategy)
-            _upload(c, path)
+            if how == "url":
+                c = _create_container_url(caption, host_video(path), audio_id)
+            else:
+                c = _create_container(caption, audio_id, strategy)
+                _upload(c, path)
             _wait_ready(c["id"])
             mid, link = _publish(c["id"])
             res = {"media_id": mid, "permalink": link, "audio": label}
@@ -125,7 +170,7 @@ def post_reel(post_mp4, preview_mp4, caption, track=None, strategy="json"):
                 atype = media_audio_type(mid)
                 res["audio_type"] = atype
                 res["music_attached"] = atype == "MUSIC" if atype else None
-                print(f"[publish] Instagram reports audio type: {atype} (strategy={strategy})")
+                print(f"[publish] Instagram reports audio type: {atype} (strategy={strategy}, {how})")
             return res
         except IGError as e:
             print(f"[publish] attempt with {label} failed: {e}")
