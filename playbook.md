@@ -21,5 +21,4 @@ Rules here override the bot's default style.
 - Totals: explain what the number implies about pace / scoring.
 
 ## My ideas (add yours below)
-- for tonight post player prop ajay mitchell o 17.5 points in atl okc game and talk about it. post it early at 5.30 mountain time my time zone because the game is at 6 my time _(added 2026-11-18)_
 - 
