@@ -17,7 +17,7 @@ from broll import fetch_clips
 
 LEAD = {"hook": 0.35}         # silence before the line starts (hook leaves room for the impact)
 TAIL = 0.32                   # breathing room after each line
-MIN_DUR = {"matchup": 3.4, "number": 3.6, "books": 4.0, "cta": 3.2}
+MIN_DUR = {"matchup": 3.4, "number": 3.6, "books": 4.0, "calc": 4.6, "shop": 4.4, "cta": 3.2}
 
 
 def build_timeline(script):
