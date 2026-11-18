@@ -89,32 +89,94 @@ def espn_facts(game):
     except Exception:
         pass
 
-    # Latest headlines about the game / teams
+    # Reports: ESPN stories about this game / these teams (shown on screen as a "report card")
     try:
-        arts = (d.get("news") or {}).get("articles") or []
-        heads = []
-        for a_ in arts[:5]:
-            hl = a_.get("headline")
-            if hl:
-                desc = (a_.get("description") or "").strip()
-                heads.append(hl + (f" — {desc[:160]}" if desc else ""))
-        if heads:
-            out["espn_headlines"] = heads
-    except Exception:
-        pass
+        out["reports"] = _reports(game, (d.get("news") or {}).get("articles") or [])
+        if not out["reports"]:
+            del out["reports"]
+    except Exception as e:
+        print(f"[enrich] reports failed: {e}")
 
-    # Open vs current line from ESPN's pick center
+    # Line movement from ESPN's pick center: spread, total and moneyline, open vs now
     try:
         for pc in d.get("pickcenter", []):
+            mv = {"provider": (pc.get("provider") or {}).get("name")}
             ps = (pc.get("pointSpread") or {}).get("home") or {}
             o, c = ps.get("open", {}).get("line"), ps.get("close", {}).get("line")
             if o and c:
-                out["espn_line_open_vs_now"] = {"provider": (pc.get("provider") or {}).get("name"),
-                                                "home_open": o, "home_now": c}
+                mv["home_spread_open"], mv["home_spread_now"] = o, c
+            tt = (pc.get("total") or {}).get("over") or {}
+            o2, c2 = tt.get("open", {}).get("line"), tt.get("close", {}).get("line")
+            if o2 and c2:
+                mv["total_open"], mv["total_now"] = str(o2).lstrip("ou"), str(c2).lstrip("ou")
+            ml = pc.get("moneyline") or {}
+            for side, team in (("home", game["home"]["abbr"]), ("away", game["away"]["abbr"])):
+                m = ml.get(side) or {}
+                mo, mc = (m.get("open") or {}).get("odds"), (m.get("close") or {}).get("odds")
+                if mo and mc:
+                    mv[f"{team}_moneyline_open"], mv[f"{team}_moneyline_now"] = mo, mc
+            if len(mv) > 1:
+                out["espn_line_open_vs_now"] = {"provider": mv["provider"], "home_open": mv.get("home_spread_open"),
+                                                "home_now": mv.get("home_spread_now")}
+                moved = (mv.get("home_spread_open") != mv.get("home_spread_now")
+                         or mv.get("total_open") != mv.get("total_now")
+                         or any(mv[k] != mv.get(k.replace("_open", "_now")) for k in mv if k.endswith("moneyline_open")))
+                mv["moved"] = bool(moved)
+                out["line_movement"] = mv
                 break
     except Exception:
         pass
     return out
+
+
+# ---------------- reports ----------------
+def _ago(iso):
+    try:
+        t = dt.datetime.fromisoformat(iso.replace("Z", "+00:00"))
+        h = (dt.datetime.now(dt.timezone.utc) - t).total_seconds() / 3600
+        return f"{int(h * 60)}m ago" if h < 1 else f"{int(h)}h ago" if h < 48 else f"{int(h // 24)}d ago"
+    except Exception:
+        return ""
+
+
+def _reports(game, game_articles):
+    """ESPN stories tied to this game, plus the league news feed filtered to these two teams. Freshest first."""
+    arts = list(game_articles)
+    try:
+        arts += _get(f"https://site.api.espn.com/apis/site/v2/sports/{PATHS[game['league']]}/news?limit=50").get("articles", [])
+    except Exception as e:
+        print(f"[enrich] ESPN news feed failed: {e}")
+    names = set()
+    for side in ("home", "away"):
+        t = game[side]
+        for k in ("name", "short"):
+            if t.get(k):
+                names.add(t[k].lower()); names.add(t[k].split()[-1].lower())
+    names = {n for n in names if len(n) > 3}
+    seen, out = set(), []
+    for a in arts:
+        hl = (a.get("headline") or "").strip()
+        if not hl or hl in seen or a.get("type") in ("Media", "video"):
+            continue
+        desc = (a.get("description") or "").strip()
+        cats = " ".join((c.get("description") or "") for c in a.get("categories") or []).lower()
+        blob = f"{hl} {desc} {cats}".lower()
+        if a not in game_articles and not any(n in blob for n in names):
+            continue
+        age_h = None
+        try:
+            age_h = (dt.datetime.now(dt.timezone.utc) - dt.datetime.fromisoformat(a["published"].replace("Z", "+00:00"))).total_seconds() / 3600
+        except Exception:
+            pass
+        if age_h is not None and age_h > 72:
+            continue
+        seen.add(hl)
+        out.append({"source": "ESPN", "headline": hl, "summary": desc[:220], "byline": (a.get("byline") or "").strip(),
+                    "ago": _ago(a.get("published", "")), "_age": 50 if age_h is None else age_h})
+    out.sort(key=lambda r: r["_age"])
+    for r in out:
+        r.pop("_age", None)
+    return out[:5]
 
 
 # ---------------- The Odds API ----------------
