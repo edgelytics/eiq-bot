@@ -153,9 +153,11 @@ def main():
     # 4) pick Instagram music
     # Instagram can silently skip attaching a song. Each post checks whether it stuck; after a miss the bot
     # tries the next way of attaching it, and if none work it bakes our own beat in (retrying every 2 days).
-    music = state.setdefault("ig_music", {"strategy": "json", "fails": 0})
+    music = state.setdefault("ig_music", {"strategy": "url", "fails": 0})
+    if music["strategy"] in ("json", "loop") and not music.get("tried_url"):
+        music["strategy"] = "url"                 # direct uploads never kept the song: use Meta's documented video_url way
     if music["strategy"] == "off" and (today - dt.date.fromisoformat(music.get("off_since", str(today)))).days >= 2:
-        music.update(strategy="json", fails=0)
+        music.update(strategy="url", fails=0)
     track = None
     if config.IG_TOKEN and music["strategy"] != "off":   # read-only lookup, also runs on dry runs so you can see the pick
         from publish import trending_music
@@ -195,8 +197,10 @@ def main():
     except Exception as e:
         notify(f"⚠️ **EIQ bot failed to post** ({slot['name']}): {e}")
         raise
+    if track and music["strategy"] == "url":
+        music["tried_url"] = True
     if track and res.get("music_attached") is False:
-        nxt = {"json": "loop", "loop": "off"}.get(music["strategy"], "off")
+        nxt = {"url": "off", "json": "loop", "loop": "off"}.get(music["strategy"], "off")
         print(f"[run] Instagram did NOT attach the song (strategy {music['strategy']}) — next time: {nxt}")
         music.update(strategy=nxt, fails=music.get("fails", 0) + 1, last_fail=str(today))
         if nxt == "off":
