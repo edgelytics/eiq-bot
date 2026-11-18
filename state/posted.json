@@ -3,7 +3,8 @@
     "NHL-401892737": "2026-11-16",
     "NBA-401910004": "2026-11-17",
     "NHL-401892741": "2026-11-17",
-    "NBA-401910005": "2026-11-17"
+    "NBA-401910005": "2026-11-17",
+    "NBA-401910015": "2026-11-18"
   },
   "posts": [
     {
@@ -55,6 +56,21 @@
       "audio": "Party With The Boys \u2014 Don Toliver (NOT attached by Instagram)",
       "audio_type": "ORIGINAL_SOUND",
       "music_attached": false
+    },
+    {
+      "date": "2026-11-18",
+      "slot": "afternoon",
+      "game": "NBA-401910015",
+      "hook": "The number is lying",
+      "kind": "game",
+      "topic": null,
+      "voice": "am_onyx",
+      "theme": "gold",
+      "media_id": "17915349378561489",
+      "permalink": "https://www.instagram.com/reel/Df5lQPjCprP/",
+      "audio": "Party With The Boys \u2014 Don Toliver",
+      "audio_type": "MUSIC",
+      "music_attached": true
     }
   ],
   "broll_used": [
@@ -86,11 +102,17 @@
     "px30935",
     "px30932",
     "px26352",
-    "px189048"
+    "px189048",
+    "px259095",
+    "px30941",
+    "px43598",
+    "px30939"
   ],
   "ig_music": {
     "strategy": "url",
-    "fails": 1,
-    "last_fail": "2026-11-18"
+    "fails": 0,
+    "last_fail": "2026-11-18",
+    "tried_url": true,
+    "last_ok": "2026-11-18"
   }
 }
