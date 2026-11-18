@@ -38,7 +38,10 @@ def font(name, size):
             if os.path.exists(p):
                 _fc[key] = ImageFont.truetype(p, size); break
         else:
-            _fc[key] = ImageFont.truetype("DejaVuSans-Bold.ttf", size)
+            if name != "Inter-Black.otf":
+                _fc[key] = font("Inter-Black.otf", size)
+            else:
+                _fc[key] = ImageFont.truetype("DejaVuSans-Bold.ttf", size)
     return _fc[key]
 
 BLACKF = "Inter-Black.otf"
@@ -46,6 +49,21 @@ XBOLD = "Inter-ExtraBold.otf"
 BOLD = "LiberationSans-Bold.ttf"
 REG = "LiberationSans-Regular.ttf"
 MONO = "LiberationMono-Bold.ttf"
+
+# ---------------- theme (set per reel by apply_theme) ----------------
+import themes as _themes
+CAP_HI, CAP_STYLE, CAP_SIZE, HOOK_ALIGN, SHADE_A, TINT = GREEN, "stroke", 92, "left", 105, None
+
+
+def apply_theme(key):
+    """Swap the module-wide colors/fonts every scene reads. Returns the theme key actually used."""
+    global GREEN, BG, BLACKF, CAP_HI, CAP_STYLE, CAP_SIZE, HOOK_ALIGN, SHADE_A, TINT
+    key = key if key in _themes.THEMES else _themes.DEFAULT
+    th = _themes.THEMES[key]
+    GREEN, BG, BLACKF = tuple(th["accent"]), tuple(th["bg"]), th["head"]
+    CAP_HI, CAP_STYLE, CAP_SIZE = tuple(th["cap_hi"]), th["caption"], th["cap_size"]
+    HOOK_ALIGN, SHADE_A, TINT = th["hook"], th["shade"], th["tint"]
+    return key
 
 
 # ---------------- helpers ----------------
@@ -173,14 +191,20 @@ def draw_hook(L, t, sc, g):
     d = ImageDraw.Draw(L)
     p, off = reveal(t, 0.0, 0.3)
     net = (g.get("networks") or [None])[0] if g else None
-    tag = " · ".join(x for x in (g["league"], net.upper() if net else None, g.get("when", "tonight").upper()) if x) if g else "EDGELYTICS IQ"
-    d.text((80, 470 + off), tag, font=font(MONO, 40), fill=A(GREEN, 255 * p))
+    if sc.get("tag"):
+        tag = sc["tag"].upper()
+    else:
+        tag = " · ".join(x for x in (g["league"], net.upper() if net else None, g.get("when", "tonight").upper()) if x) if g and g.get("league") else "EDGELYTICS IQ"
+    if HOOK_ALIGN == "left":
+        d.text((80, 470 + off), tag, font=font(MONO, 40), fill=A(GREEN, 255 * p))
+    else:
+        d.text((CX, 490 + off), tag, font=font(MONO, 40), fill=A(GREEN, 255 * p), anchor="mm")
     words = sc["text"].upper().split()
     accent = (sc.get("accent") or "").upper().strip(".,!?")
     f, lines = fit_lines(words, BLACKF, 138, RX - LX - 20, 3)
     y = 560; k = 0
     for ln in lines:
-        x = 80
+        x = 80 if HOOK_ALIGN == "left" else CX - f.getlength(" ".join(ln)) / 2
         for w in ln:
             t0 = 0.08 + k * 0.13
             q = (t - t0) / 0.18
@@ -194,7 +218,10 @@ def draw_hook(L, t, sc, g):
             k += 1
         y += int(f.size * 1.09)
     bar = ease_out((t - 0.15 - k * 0.13) / 0.4)
-    d.rectangle([80, y + 20, 80 + int(560 * bar), y + 38], fill=A(GREEN, 255))
+    if HOOK_ALIGN == "left":
+        d.rectangle([80, y + 20, 80 + int(560 * bar), y + 38], fill=A(GREEN, 255))
+    else:
+        d.rectangle([CX - int(280 * bar), y + 20, CX + int(280 * bar), y + 38], fill=A(GREEN, 255))
 
 
 def draw_matchup(L, t, sc, g):
@@ -288,8 +315,8 @@ def draw_number(L, t, sc, g):
             d.line([(X(v), y - hgt * q), (X(v), y + hgt * q)], fill=A(GREEN if key else WHITE, 255 * q), width=8 if key else 3)
             d.text((X(v), y + 110), str(v), font=font(BLACKF if key else BOLD, 58 if key else 40),
                    fill=A(GREEN if key else GREY, 255 * q), anchor="mm")
-        d.text((110, 560), "KEY NUMBERS", font=font(BLACKF, 92), fill=A(WHITE, 255 * p))
-        d.text((110, 670), "Most NFL games land on 3 and 7", font=font(BOLD, 44), fill=A(GREY, 255 * p))
+        d.text((110, 420), "KEY NUMBERS", font=font(BLACKF, 92), fill=A(WHITE, 255 * p))
+        d.text((110, 535), "Most NFL games land on 3 and 7", font=font(BOLD, 44), fill=A(GREY, 255 * p))
         m = ease_out((t - 0.9) / 0.8); mx = X(lo) + (X(s) - X(lo)) * m
         d.polygon([(mx, y - 95), (mx - 26, y - 140), (mx + 26, y - 140)], fill=A(WHITE, 255 * m))
         d.text((mx, y - 185), f"{fav} {g['spread']:+g}".strip(), font=font(BLACKF, 56), fill=A(WHITE, 255 * m), anchor="mm")
@@ -369,6 +396,120 @@ def draw_point(L, t, sc, g, idx):
     d.rectangle([40, 600, 52, 600 + int((y - 610) * hb)], fill=A(GREEN, 255))
 
 
+
+# ---------------- explainer scenes ----------------
+def am_dec(a):
+    a = float(a)
+    return 1 + a / 100 if a > 0 else 1 + 100 / abs(a)
+
+
+def am_txt(a):
+    return f"{int(a):+d}"
+
+
+def example_chip(d, t, y=330):
+    p, off = reveal(t, 0.0, 0.3)
+    w = font(MONO, 30).getlength("EXAMPLE") + 36
+    d.rounded_rectangle([RX - w, y + off, RX, y + 50 + off], radius=12, outline=A(GREY, 200 * p), width=2)
+    d.text((RX - w / 2, y + 25 + off), "EXAMPLE", font=font(MONO, 30), fill=A(GREY, 230 * p), anchor="mm")
+
+
+def draw_calc(L, t, sc, g):
+    """Odds math made visual. modes: arb | stakes | vig | odds"""
+    d = ImageDraw.Draw(L)
+    mode = sc.get("mode", "arb")
+    odds = sc.get("odds") or [110, 105]
+    names = sc.get("names") or ["BOOK A", "BOOK B"]
+    p, off = reveal(t, 0.0, 0.3)
+    d.text((80, 330 + off), (sc.get("label") or "THE MATH").upper(), font=font(MONO, 40), fill=A(GREEN, 255 * p))
+    example_chip(d, t)
+    imp = [1 / am_dec(a) for a in odds]
+    if mode == "stakes":
+        total = float(sc.get("total", 1000))
+        s_imp = sum(imp)
+        stakes = [total * i / s_imp for i in imp]
+        pay = [st * am_dec(a) for st, a in zip(stakes, odds)]
+        y = 440
+        for i, (nm, a, st, pv) in enumerate(zip(names, odds, stakes, pay)):
+            q = ease_out((t - 0.2 - i * 0.25) / 0.4)
+            if q <= 0: y += 300; continue
+            dx = (1 - q) * 900
+            d.rounded_rectangle([LX + dx, y, RX + dx, y + 260], radius=26, fill=A(BG, 215 * q), outline=A(WHITE, 50 * q), width=2)
+            d.text((115 + dx, y + 30), f"{nm.upper()}  {am_txt(a)}", font=fit_size(f"{nm.upper()}  {am_txt(a)}", MONO, 38, RX - LX - 70), fill=A(GREEN, 255 * q))
+            d.text((115 + dx, y + 85), f"BET ${st:,.2f}", font=fit_size(f"BET ${st:,.2f}", BLACKF, 84, RX - LX - 70), fill=A(WHITE, 255 * q))
+            d.text((115 + dx, y + 190), f"PAYS ${pv:,.2f}", font=font(BOLD, 46), fill=A(GREY, 255 * q))
+            y += 300
+        q = (t - 1.2) / 0.35
+        if q > 0:
+            prof = min(pay) - total
+            badge = text_img(f"PROFIT EITHER WAY: ${prof:,.2f}", fit_size(f"PROFIT EITHER WAY: ${prof:,.2f}", BLACKF, 52, RX - LX - 60), A(BG, 255), 0)
+            bg = Image.new("RGBA", (badge.width + 50, badge.height + 36), A(GREEN, 255)); bg.alpha_composite(badge, (25, 18))
+            paste_scaled(L, bg, CX, y + 40, ease_back(q), 1)
+        return
+    # arb / vig / odds: implied-probability bars
+    y = 450
+    for i, (nm, a, pr) in enumerate(zip(names, odds, imp)):
+        q = ease_out((t - 0.2 - i * 0.3) / 0.4)
+        if q <= 0: y += 250; continue
+        d.text((LX, y), nm.upper(), font=fit_size(nm.upper(), MONO, 38, RX - LX), fill=A(GREY, 255 * q))
+        d.text((LX, y + 50), am_txt(a), font=font(BLACKF, 110), fill=A(WHITE, 255 * q))
+        if mode == "odds":
+            line = f"BET $100 TO WIN ${100 * (am_dec(a) - 1):,.0f}" if a > 0 else f"BET ${abs(a):,.0f} TO WIN $100"
+            ow = font(BLACKF, 110).getlength(am_txt(a)) + 40
+            d.text((LX + ow, y + 80), line, font=fit_size(line, BOLD, 44, RX - LX - ow), fill=A(WHITE, 230 * q), anchor="lm")
+        bx0, by0, bx1 = LX, y + 185, RX
+        d.rounded_rectangle([bx0, by0, bx1, by0 + 34], radius=17, fill=A(WHITE, 30 * q))
+        fill_w = (bx1 - bx0) * pr * ease_out((t - 0.45 - i * 0.3) / 0.6)
+        if fill_w > 20:
+            d.rounded_rectangle([bx0, by0, bx0 + fill_w, by0 + 34], radius=17, fill=A(GREEN, 255 * q))
+        d.text((RX, y + 150), f"{pr * 100:.2f}%", font=font(BLACKF, 48), fill=A(GREEN, 255 * q), anchor="rm")
+        y += 250
+    q = (t - 1.3) / 0.35
+    if q <= 0:
+        return
+    tot = sum(imp) * 100
+    if mode == "arb":
+        verdict = f"TOTAL {tot:.2f}%  <  100%" if tot < 100 else f"TOTAL {tot:.2f}%  —  NO ARB"
+        sub = f"PROFIT EITHER WAY: +{(100 / tot - 1) * 100:.2f}%" if tot < 100 else "BOOKS KEEP THE EDGE"
+    elif mode == "vig":
+        verdict = f"TOTAL {tot:.2f}%  >  100%"
+        sub = f"THE BOOK'S CUT: {(1 - 100 / tot) * 100:.2f}%"
+    else:
+        verdict = "PLUS = UNDERDOG"
+        sub = "MINUS = FAVORITE"
+    verdict, sub = sc.get("verdict") or verdict, sc.get("sub") or sub
+    d.text((CX, y + 20), verdict, font=fit_size(verdict, BLACKF, 64, RX - LX), fill=A(WHITE, 255 * min(1, q)), anchor="mm")
+    badge = text_img(sub, fit_size(sub, BLACKF, 50, RX - LX - 60), A(BG, 255), 0)
+    bg = Image.new("RGBA", (badge.width + 50, badge.height + 36), A(GREEN, 255)); bg.alpha_composite(badge, (25, 18))
+    paste_scaled(L, bg, CX, y + 120, ease_back(q), 1)
+
+
+def draw_shop(L, t, sc, g):
+    """Same bet at several books (example rows from the script), best one highlighted."""
+    d = ImageDraw.Draw(L)
+    rows = sc.get("rows") or []
+    best = sc.get("best", 0)
+    p, off = reveal(t, 0.0, 0.3)
+    d.text((80, 330 + off), (sc.get("label") or "SAME BET, 4 BOOKS").upper(), font=font(MONO, 40), fill=A(GREEN, 255 * p))
+    example_chip(d, t)
+    head = (sc.get("title") or "").upper()
+    if head:
+        d.text((80, 395 + off), head, font=fit_size(head, BLACKF, 66, RX - LX), fill=A(WHITE, 255 * p))
+    y = 520
+    for i, (book, line, price) in enumerate(rows[:5]):
+        q = ease_out((t - 0.25 - i * 0.14) / 0.4)
+        if q <= 0: y += 140; continue
+        dx = (1 - q) * 900
+        hit = i == best and t > 1.0 + 0.14 * len(rows)
+        fill = A(GREEN, 235 * q) if hit else A(BG, 200 * q)
+        txt = A(BG, 255 * q) if hit else A(WHITE, 255 * q)
+        d.rounded_rectangle([LX + dx, y, RX + dx, y + 115], radius=22, fill=fill, outline=None if hit else A(WHITE, 50 * q), width=2)
+        d.text((115 + dx, y + 57), book.upper(), font=fit_size(book.upper(), BLACKF, 50, 400), fill=txt, anchor="lm")
+        d.text((RX - 170 + dx, y + 57), str(line), font=font(BLACKF, 60), fill=txt, anchor="rm")
+        d.text((RX - 25 + dx, y + 57), str(price), font=font(MONO, 34), fill=A(BG if hit else GREY, 255 * q), anchor="rm")
+        y += 140
+
+
 class CTA:
     def __init__(self):
         logo = text_img("EIQ", font(BLACKF, 300), A(WHITE, 255), 0)
@@ -390,7 +531,8 @@ class CTA:
         s = 1 + 0.04 * math.sin(t * 6)
         pill = Image.new("RGBA", (560, 130), (0, 0, 0, 0)); dp = ImageDraw.Draw(pill)
         dp.rounded_rectangle([0, 0, 559, 129], radius=65, fill=A(GREEN, 255))
-        dp.text((280, 65), "FOLLOW " + HANDLE.upper(), font=font(BLACKF, 40), fill=A(BG, 255), anchor="mm")
+        lbl = "FOLLOW " + HANDLE.upper()
+        dp.text((280, 65), lbl, font=fit_size(lbl, BLACKF, 40, 480), fill=A(BG, 255), anchor="mm")
         paste_scaled(L, pill, CX, 1010 + off2, s, p2)
         d.text((CX, 1180), DISCLAIMER, font=fit_size(DISCLAIMER, MONO, 28, RX - LX), fill=A(GREY, 230 * p2), anchor="mm")
 
@@ -414,15 +556,32 @@ def draw_caption(L, t, chunks):
         nxt = chunks[i + 1][0][1] if i + 1 < len(chunks) else end + 0.4
         if not (start <= t < max(end, nxt)):
             continue
-        f = font(BLACKF, 92)
+        f = font(BLACKF, CAP_SIZE)
         parts = [(w.upper().strip(), s, e) for w, s, e in ch]
         widths = [f.getlength(w + " ") for w, _, _ in parts]
-        im = Image.new("RGBA", (int(sum(widths)) + 40, 150), (0, 0, 0, 0)); di = ImageDraw.Draw(im)
-        x = 20
+        tw = int(sum(widths) - f.getlength(" "))
+        boxed = CAP_STYLE in ("box", "box_white")
+        pad = 34 if boxed else 20
+        hgt = int(CAP_SIZE * 1.55)
+        im = Image.new("RGBA", (tw + pad * 2, hgt), (0, 0, 0, 0)); di = ImageDraw.Draw(im)
+        if CAP_STYLE == "box":
+            di.rounded_rectangle([0, 0, im.width - 1, hgt - 1], radius=26, fill=(0, 0, 0, 190))
+        elif CAP_STYLE == "box_white":
+            di.rounded_rectangle([0, 0, im.width - 1, hgt - 1], radius=26, fill=(255, 255, 255, 245))
+        x = pad
+        ty = (hgt - CAP_SIZE * 1.2) / 2
         for (w, s, e), wd in zip(parts, widths):
             on = s <= t
-            col = A(GREEN, 255) if (s <= t < e + 0.05) else A(WHITE, 255 if on else 110)
-            di.text((x, 20), w, font=f, fill=col, stroke_width=8, stroke_fill=(0, 0, 0, 240))
+            speaking = s <= t < e + 0.05
+            if CAP_STYLE == "box_white":
+                col = A(CAP_HI, 255) if speaking else (A((10, 10, 10), 255) if on else A((10, 10, 10), 120))
+                di.text((x, ty), w, font=f, fill=col)
+            elif CAP_STYLE == "box":
+                col = A(CAP_HI, 255) if speaking else A(WHITE, 255 if on else 110)
+                di.text((x, ty), w, font=f, fill=col)
+            else:
+                col = A(CAP_HI, 255) if speaking else A(WHITE, 255 if on else 110)
+                di.text((x, ty), w, font=f, fill=col, stroke_width=8, stroke_fill=(0, 0, 0, 240))
             x += wd
         fit = min(1.0, (RX - LX + 20) / im.width)
         pop = (0.82 + 0.18 * ease_back((t - start) / 0.14)) * fit
@@ -431,18 +590,21 @@ def draw_caption(L, t, chunks):
 
 
 # ---------------- main render ----------------
-def render_video(script, game, timeline, total, out_path, broll_paths=()):
+def render_video(script, game, timeline, total, out_path, broll_paths=(), theme=None):
     """timeline: list of {scene, start, dur, words:[(w, abs_start, abs_end)]}"""
+    apply_theme(theme or script.get("theme"))
     if broll_paths:
         readers = [ClipReader(p) for p in broll_paths]
         bg_src = None
     else:
         readers = []
-        c1 = hex_rgb(game["away"]["color"]) if game else GREEN
-        c2 = hex_rgb(game["home"]["color"]) if game else GREEN
+        c1 = hex_rgb(game["away"]["color"]) if game and game.get("away") else GREEN
+        c2 = hex_rgb(game["home"]["color"]) if game and game.get("home") else BG
         bg_src = GradientBG(c1, c2)
     vig = vignette()
-    shade = Image.new("RGBA", (W, H), (7, 7, 7, 105))   # extra darkening over real footage
+    shade = Image.new("RGBA", (W, H), (BG[0], BG[1], BG[2], SHADE_A))   # darken real footage for legibility
+    if TINT:
+        shade.alpha_composite(Image.new("RGBA", (W, H), tuple(TINT)))
     cta = CTA()
     all_words = [w for seg in timeline for w in seg["words"]]
     chunks = caption_chunks(all_words)
@@ -484,6 +646,8 @@ def render_video(script, game, timeline, total, out_path, broll_paths=()):
         elif typ == "number": draw_number(L, lt, sc, game)
         elif typ == "books": draw_books(L, lt, sc, game)
         elif typ == "point": draw_point(L, lt, sc, game, point_idx[id(seg)])
+        elif typ == "calc": draw_calc(L, lt, sc, game)
+        elif typ == "shop": draw_shop(L, lt, sc, game)
         elif typ == "cta": cta.draw(L, lt, sc, game)
         frame.alpha_composite(L)
 
