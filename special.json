@@ -1,0 +1,12 @@
+{
+  "date": "2026-11-18",
+  "slot": "primetime",
+  "post_ct": "18:30",
+  "league": "NBA",
+  "teams": ["ATL", "OKC"],
+  "player": "Ajay Mitchell",
+  "stat": "points",
+  "line": 17.5,
+  "side": "over",
+  "pick": "Ajay Mitchell over 17.5 points"
+}
