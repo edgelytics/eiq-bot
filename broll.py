@@ -22,7 +22,8 @@ SPORT_QUERIES = {
     "NFL": ["american football", "american football game", "football stadium", "quarterback", "touchdown", "american football field"],
     "CFB": ["american football", "college football", "football stadium", "american football game", "touchdown"],
     "NBA": ["basketball", "basketball game", "basketball dunk", "basketball court", "basketball player", "basketball hoop"],
-    "NHL": ["ice hockey", "hockey game", "hockey player", "ice hockey puck", "hockey arena"],
+    "NHL": ["ice hockey", "hockey game", "hockey player", "ice hockey puck", "hockey arena", "hockey",
+            "hockey stick", "hockey goalie", "ice hockey game", "hockey match"],
 }
 # A clip must carry at least one of these tags to be used...
 REQUIRED_TAGS = {
@@ -98,38 +99,29 @@ def _pexels(query, used):
     return out
 
 
-def fetch_clips(query, n=3, folder="cache/broll", league=None, used=()):
-    """Returns (paths, clip_ids). Only on-topic clips for the game's sport; empty -> branded background."""
-    if not (PIXABAY_KEY or PEXELS_KEY):
-        return [], []
-    os.makedirs(folder, exist_ok=True)
-    used = set(used)
-    queries = list(SPORT_QUERIES.get(league, []))
-    random.shuffle(queries)
-    if not queries:
-        queries = [query]
+def _search(queries, n, used, league):
     pool = []
     for q in queries:
         try:
             got = _pixabay(q, used, league) if PIXABAY_KEY else _pexels(q, used)
             print(f"[broll] '{q}': {len(got)} on-topic clips")
-            pool += got
+            pool += [c for c in got if c[0] not in {x[0] for x in pool}]
         except Exception as e:
             print(f"[broll] search '{q}' failed: {e}")
         if len(pool) >= n * 3:
             break
-    if not pool and used:
-        # every on-topic clip has been used before: allow repeats rather than go off-topic
-        return fetch_clips(query, n, folder, league, used=())
+    return pool
+
+
+def _download_pool(pool, n, folder):
     # best-quality clips first, then shuffle the top group so videos still look different
-    pool.sort(key=lambda c: c[2], reverse=True)
+    pool = sorted(pool, key=lambda c: c[2], reverse=True)
     top = pool[:max(n * 3, 10)]
     random.shuffle(top)
-    paths, ids, seen = [], [], set()
+    paths, ids = [], []
     for cid, url, _q in top:
-        if cid in seen:
+        if cid in ids:
             continue
-        seen.add(cid)
         p = os.path.join(folder, f"{cid}.mp4")
         try:
             if not os.path.exists(p):
@@ -140,6 +132,30 @@ def fetch_clips(query, n=3, folder="cache/broll", league=None, used=()):
         if len(paths) >= n:
             break
     return paths, ids
+
+
+def fetch_clips(query, n=3, folder="cache/broll", league=None, used=()):
+    """Returns (paths, clip_ids). Only on-topic clips for the game's sport; empty -> branded background.
+    query may hold several searches separated by '|' (used when there's no league)."""
+    if not (PIXABAY_KEY or PEXELS_KEY):
+        return [], []
+    os.makedirs(folder, exist_ok=True)
+    used = set(used)
+    queries = list(SPORT_QUERIES.get(league, []))
+    random.shuffle(queries)
+    if not queries:
+        queries = [q.strip() for q in (query or "stadium lights").split("|") if q.strip()]
+    pool = _search(queries, n, used, league)
+    if len(pool) < n and used:
+        # not enough fresh on-topic clips: top up with ones used before rather than go off-topic
+        have = {c[0] for c in pool}
+        older = [c for c in _search(queries, n, set(), league) if c[0] not in have]
+        older.sort(key=lambda c: c[2], reverse=True)
+        print(f"[broll] only {len(pool)} fresh clips — adding {min(len(older), n - len(pool))} reused")
+        fresh_paths, fresh_ids = _download_pool(pool, n, folder) if pool else ([], [])
+        old_paths, old_ids = _download_pool(older[:max(n - len(fresh_ids), 0) * 2], n - len(fresh_ids), folder)
+        return fresh_paths + old_paths, fresh_ids + old_ids
+    return _download_pool(pool, n, folder)
 
 
 class ClipReader:
