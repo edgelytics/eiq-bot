@@ -48,7 +48,7 @@ KIND_CHOICE = os.environ.get("EIQ_KIND", "auto") or "auto"     # auto | game | e
 TOPIC_CHOICE = os.environ.get("EIQ_TOPIC", "") or ""            # explainer topic id, blank = next in rotation
 
 # ---------- Instagram music (attached at post time via the Audio API) ----------
-IG_MUSIC_VOLUME = 50     # 1-100, how loud the Instagram track sits under the voice (owner asked for 50%)
+IG_MUSIC_VOLUME = 15     # 1-100, how loud the Instagram track sits under the voice (owner: 22 was a bit loud)
 IG_VIDEO_VOLUME = 100    # 1-100, your voiceover/SFX track
 
 # ---------- optional services ----------
