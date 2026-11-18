@@ -138,7 +138,12 @@ def main():
             except Exception as e:
                 print(f"[run] enrich failed ({e}) — continuing without extra facts")
         recent_hooks = [p.get("hook") for p in state["posts"][-12:] if p.get("hook")]
-        script = write_script(game, slot["angle"], recent_hooks)
+        recent_lines = [p.get("vo") for p in state["posts"][-6:] if p.get("vo")]
+        from writer import eligible_formats
+        fmt = lru(eligible_formats(game), state["posts"], "format")
+        print(f"[run] format={fmt} (options: {', '.join(eligible_formats(game))})")
+        script = write_script(game, slot["angle"], recent_hooks, fmt, recent_lines)
+        print(f"[run] script by {script.get('writer')}: " + " / ".join(sc["vo"] for sc in script["scenes"])[:600])
         script["kind"] = "game"
         label = f"{game['away']['abbr']}_{game['home']['abbr']}"
 
@@ -212,6 +217,8 @@ def main():
         state["games"][game["id"]] = str(today)
     state["posts"].append({"date": str(today), "slot": slot["name"], "game": game.get("id"),
                            "hook": script["scenes"][0].get("text"), "kind": kind, "topic": script.get("topic"),
+                           "format": script.get("format"), "writer": script.get("writer"),
+                           "vo": " ".join(sc["vo"] for sc in script["scenes"])[:400],
                            "voice": voice, "theme": theme, **res})
     save_state(state)
     what = explainers.TOPICS[script["topic"]]["title"] if kind == "explainer" else f"{game['away']['abbr']} @ {game['home']['abbr']}"
