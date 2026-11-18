@@ -1,10 +1,10 @@
 {
- "updated": "2026-11-17T23:28:42+00:00",
+ "updated": "2026-11-18T01:30:27+00:00",
  "account": {
   "username": "edgelytics.iq",
   "followers_count": 3,
   "follows_count": 0,
-  "media_count": 4
+  "media_count": 5
  },
  "history": [
   {
@@ -30,20 +30,41 @@
    "followers": 3,
    "views": 331,
    "likes": 7
+  },
+  {
+   "t": "2026-11-18T01:30:27+00:00",
+   "followers": 3,
+   "views": 356,
+   "likes": 7
   }
  ],
  "media": [
+  {
+   "id": "18148266580597748",
+   "permalink": "https://www.instagram.com/reel/Df3VC-Yge4R/",
+   "timestamp": "2026-11-18T01:30:20+0000",
+   "type": "REELS",
+   "thumb": "https://scontent-ord5-1.cdninstagram.com/v/t51.71878-15/910333136_1608359193887262_4752580893954318656_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=101&_nc_map=urlgen_bucketless&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=A4gruKPv1jsQ7kNvwE_r842&_nc_oc=AdqfQQNSF9ArOD47c28027hncYYx61PvDZs48M15oPbsBn18jIg0dCTc-LCRzj62nXQ&_nc_zt=23&_nc_ht=scontent-ord5-1.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=7vNyCHdjwlSGB3TmghdEUQ&_nc_tpa=Q5bMBQLw59lKo3rNz0hKlenrhS4RBBghCeOjtWkJ6CTUYLOjvu8_Q-EId3jI8hCGFgql2JhWAJnxmwf0cQ&_nc_ct=RQosPBUKFQQAAAA&oh=00_AQSY5swYCBfMqMmGBgd8hGzKg8-nmgOMZ7NTdtzZ5Cf4LQ&oe=6B02EE21",
+   "caption": "Hornets at Lakers tonight. The spread says LAL -7.5.",
+   "likes": 0,
+   "comments": 0,
+   "views": 0,
+   "reach": 0,
+   "saves": 0,
+   "shares": 0,
+   "interactions": 0
+  },
   {
    "id": "18114190340228052",
    "permalink": "https://www.instagram.com/reel/Df3Acmsjg35/",
    "timestamp": "2026-11-17T22:30:27+0000",
    "type": "REELS",
-   "thumb": "https://scontent-dfw6-1.cdninstagram.com/v/t51.71878-15/912519612_1533949128574583_8181476245295714376_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=105&_nc_map=urlgen_bucketless&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=RjGo2Y6VzjoQ7kNvwGdGHbP&_nc_oc=AdoMxyZSvpKUUPItW0osbQ4uEiVFKXlhSDE77QzsBGDjsetBVWYrS5855Z3M5m_R_IM&_nc_zt=23&_nc_ht=scontent-dfw6-1.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=lHq-WfknYh5LJ70RXpmRYA&_nc_tpa=Q5bMBQKKBtSCCMZvcCVN8cdBbblKlXHU9EHtbayQlkv-B9cTbVP5CMBqybaC7mc28JqIKlXwFGBAa_mt6g&_nc_ct=RQosPBUKFQQAAAA&oh=00_AQRkKSKruRJOJ4uB9hJkXBCwpWgEiJsMLE9j2wwX3ObGeg&oe=6B02C900",
+   "thumb": "https://scontent-ord5-2.cdninstagram.com/v/t51.71878-15/912519612_1533949128574583_8181476245295714376_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=105&_nc_map=urlgen_bucketless&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=RjGo2Y6VzjoQ7kNvwG-4nK2&_nc_oc=Ado1WAr4gYr-3M9yFacPBNwJhBrZpX9_G2t6dRJDywMPZ-IslLqz5lUYK1RIGen0fGw&_nc_zt=23&_nc_ht=scontent-ord5-2.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=7vNyCHdjwlSGB3TmghdEUQ&_nc_tpa=Q5bMBQKxtvKQMijN5XWCCGtSK2qqvk0-HIEUhOBWOF-DloGjB7xdJ_TJYKZ3YsWC1cGAGcJ1yQl3U9WlLQ&_nc_ct=RQosPBUKFQQAAAA&oh=00_AQR74_ARJryzeGZ0tMsihNKbNmxyv9tnHEPkqCVt8lfKfQ&oe=6B02C900",
    "caption": "Avalanche at Mammoth tomorrow night. The puck line says UTAH -108.",
    "likes": 0,
    "comments": 0,
-   "views": 1,
-   "reach": 1,
+   "views": 26,
+   "reach": 21,
    "saves": 0,
    "shares": 0,
    "interactions": 0
@@ -53,12 +74,12 @@
    "permalink": "https://www.instagram.com/reel/Df2nMJHjh1z/",
    "timestamp": "2026-11-17T18:49:41+0000",
    "type": "REELS",
-   "thumb": "https://scontent-dfw6-1.cdninstagram.com/v/t51.71878-15/910814672_1008653431606290_5983485072805713952_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=109&_nc_map=urlgen_bucketless&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=ommi6uB27k4Q7kNvwGR_-1b&_nc_oc=Adp7iFdTU_kZ117_N3HQqkwSFdqY5pWDzCFEdJS5q2DZFIyfWfeevGuAmRmDLyWXh8w&_nc_zt=23&_nc_ht=scontent-dfw6-1.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=lHq-WfknYh5LJ70RXpmRYA&_nc_tpa=Q5bMBQKZG3iSPmswF714AxK1z5EPyosxHaMDTLoIIK25l7ZMh1Ud1l0PcXdaiBCMnHm8GigrYTAK2ZpCaw&_nc_ct=RQosPBUKFQQAAAA&oh=00_AQRXYTQ2AHD0kF1fSt6wRFNdtU8ORmVxs_3FayE3XQ8rFw&oe=6B02CBC6",
+   "thumb": "https://scontent-ord5-2.cdninstagram.com/v/t51.71878-15/910814672_1008653431606290_5983485072805713952_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=109&_nc_map=urlgen_bucketless&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=ommi6uB27k4Q7kNvwFZtPIL&_nc_oc=AdpUaAPhx9tVfsxRQ8X0Z5LmgDE6f1NvUb6Th5_V9Zgr34B7eQAv0b8FHhyZGtpe79I&_nc_zt=23&_nc_ht=scontent-ord5-2.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=7vNyCHdjwlSGB3TmghdEUQ&_nc_tpa=Q5bMBQJonacMnuRruRngpXt7hGKizFSNY8bGmrtHpuBpkMrnV-qprfVReDQckRRmnpKvaFudG2E_CLxgmA&_nc_ct=RQosPBUKFQQAAAA&oh=00_AQTXT5InnWEYou1JBf3ks8yFzeBrLuEtWOJ98PfvxZpXZw&oe=6B02CBC6",
    "caption": "DraftKings moved San Antonio from -7.5 to -9.5 after Detroit ruled out four players.",
    "likes": 1,
    "comments": 0,
    "views": 35,
-   "reach": 29,
+   "reach": 31,
    "saves": 0,
    "shares": 0,
    "interactions": 1
@@ -68,12 +89,12 @@
    "permalink": "https://www.instagram.com/reel/Df086IKj9dl/",
    "timestamp": "2026-11-17T03:21:04+0000",
    "type": "REELS",
-   "thumb": "https://scontent-dfw5-3.cdninstagram.com/v/t51.71878-15/913416545_1607648570612410_361130378043552874_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&_nc_map=urlgen_bucketless&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=sZI_ohFUZIwQ7kNvwHKL4Jr&_nc_oc=AdorENIjxNVQNlwt9fnYAIutOr7p_cL6mzm6us1bmo7Dk-7IOF1Rf8vgPyMvITIccDc&_nc_zt=23&_nc_ht=scontent-dfw5-3.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=lHq-WfknYh5LJ70RXpmRYA&_nc_tpa=Q5bMBQLGZsuK6vi-YB2PXkvoETPL6BhqA6lwQ4ev6ssnxcmYZx8ejV24CMWN30WFADzG8x3s0Eu1NKrgbQ&_nc_ct=RQosPBUKFQQAAAA&oh=00_AQTXB6vsyadObv9UnMgRUTG9x4_8FKjcdajuMPwSOo1JIg&oe=6B02D090",
+   "thumb": "https://scontent-ord5-2.cdninstagram.com/v/t51.71878-15/913416545_1607648570612410_361130378043552874_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&_nc_map=urlgen_bucketless&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=sZI_ohFUZIwQ7kNvwFSugK2&_nc_oc=AdpgzIqF-_C8C_ALKJVZS2n_Pbljb-eueSWSo2_A7eGmgZQIRlLuehZzIbrz-AMvUts&_nc_zt=23&_nc_ht=scontent-ord5-2.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=7vNyCHdjwlSGB3TmghdEUQ&_nc_tpa=Q5bMBQL0_-dUA5_9ZKkAIt_89hE2XlVtXkWZonvtb5_kcEuusHwSPs7jMqTKhtlI5pOI_nzLpzZ4iEWsnQ&_nc_ct=RQosPBUKFQQAAAA&oh=00_AQTaldz3MNV12Ktf_LNb3z4v98GOYzzjJguhLeUTMCwh9g&oe=6B02D090",
    "caption": "Stars at Golden Knights. The line says VGK -135.",
    "likes": 0,
    "comments": 0,
    "views": 73,
-   "reach": 63,
+   "reach": 64,
    "saves": 1,
    "shares": 0,
    "interactions": 1
@@ -83,7 +104,7 @@
    "permalink": "https://www.instagram.com/reel/DbZRRJKxu0O/",
    "timestamp": "2026-07-29T23:14:53+0000",
    "type": "REELS",
-   "thumb": "https://scontent-dfw6-1.cdninstagram.com/v/t51.82787-15/758499827_18074987405443536_886134099439595032_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=105&_nc_map=urlgen_bucketless&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=neHtnAyI3bAQ7kNvwF-qonY&_nc_oc=AdrGyc0-o0Spx87l-vfMST4R5Ua06vENZzXAuSN3xissvMoTYCfDU_4auIWv0XMhQqI&_nc_zt=23&_nc_ht=scontent-dfw6-1.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=lHq-WfknYh5LJ70RXpmRYA&_nc_tpa=Q5bMBQK7I58mfhjD6Riqwf_c5uEmSneO8rC49N3WoI2btLOTWryAbeclBaFZ-vujcQNBERU3qksC4r1kTQ&_nc_ct=RQosPBUKFQQAAAA&oh=00_AQTmeO4Hg_qQlUYK69me98dsbQBhpuYNL1dK_aCuGPbh1g&oe=6B02AF75",
+   "thumb": "https://scontent-ord5-1.cdninstagram.com/v/t51.82787-15/758499827_18074987405443536_886134099439595032_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=105&_nc_map=urlgen_bucketless&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=neHtnAyI3bAQ7kNvwEBD6Vd&_nc_oc=AdpnFnTe7eutQmwwsF-okYNPjQfU7g5fwkjol8PbL5uLCD197vO5PlftT28ONmmQFyg&_nc_zt=23&_nc_ht=scontent-ord5-1.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=7vNyCHdjwlSGB3TmghdEUQ&_nc_tpa=Q5bMBQJEI5okUPe7pY7cAsaDdqruqztpOBhxOeuzIcP4WNU57F2d1A_PTC4irouIMLm68NoCGPD7LLCROw&_nc_ct=RQosPBUKFQQAAAA&oh=00_AQTrDgZZ_KdNHqABiBaYDgeITpi6u2dwzzRmnFIZurZlhA&oe=6B02E7B5",
    "caption": "In 1984, a math nerd named Bill Benter moved to Hong Kong with a theory: horse racing odds were public, but that didn\u2019t mean they were corre",
    "likes": 2,
    "comments": 0,
@@ -98,7 +119,7 @@
    "permalink": "https://www.instagram.com/reel/DbWzkwVxjsa/",
    "timestamp": "2026-07-29T00:16:40+0000",
    "type": "REELS",
-   "thumb": "https://scontent-dfw5-2.cdninstagram.com/v/t51.82787-15/757545468_18074671163443536_6014940706598105782_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=105&_nc_map=urlgen_bucketless&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=IWJexFKwQjEQ7kNvwF2LGP1&_nc_oc=AdqMfvluDLcQdHrnDKXU0iCOgj3u3gdN8uHr6VxAXE4JyDXD4mQLQZcXZrYdgQ6cMhM&_nc_zt=23&_nc_ht=scontent-dfw5-2.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=lHq-WfknYh5LJ70RXpmRYA&_nc_tpa=Q5bMBQJr-uG06HgL97XL2h2jfCbhaINt4_iDNlkLJSfZBnA24k6oog3lKLlYw25HhaxnWN2t2WSmzOQv1w&_nc_ct=RQosPBUKFQQAAAA&oh=00_AQROCQQWB6bwYe09kMV5em1MHP1vnbTTJkV6VqRAGW3jQQ&oe=6B02BC61",
+   "thumb": "https://scontent-ord5-1.cdninstagram.com/v/t51.82787-15/757545468_18074671163443536_6014940706598105782_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=105&_nc_map=urlgen_bucketless&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=IWJexFKwQjEQ7kNvwFMOmuP&_nc_oc=AdpQVebxrYpRI_Uij_b_qPkN27ji1ZDOSTcQxpn2eivfpDEjapzfLhYBWGbHsV6qOwI&_nc_zt=23&_nc_ht=scontent-ord5-1.cdninstagram.com&edm=AFF3FJ0EAAAA&_nc_gid=7vNyCHdjwlSGB3TmghdEUQ&_nc_tpa=Q5bMBQL8QQO-2g9ZMht1UdEfnLg1J_CByinJDgoMu7v40iMlmo2LeUSfkzmWHEC7o0oDJlg0i15vdoSETQ&_nc_ct=RQosPBUKFQQAAAA&oh=00_AQSX1Wq2nl_TrsLiNP9_qrGjftNgcpqfhXWkLZWiFJ5pkg&oe=6B02BC61",
    "caption": "Why did that line move 40 cents in under 10 seconds? It\u2019s not random \u2014 sharp money, book",
    "likes": 2,
    "comments": 0,

@@ -2,7 +2,8 @@
   "games": {
     "NHL-401892737": "2026-11-16",
     "NBA-401910004": "2026-11-17",
-    "NHL-401892741": "2026-11-17"
+    "NHL-401892741": "2026-11-17",
+    "NBA-401910005": "2026-11-17"
   },
   "posts": [
     {
@@ -11,7 +12,7 @@
       "game": "NHL-401892737",
       "media_id": "18376914250301450",
       "permalink": "https://www.instagram.com/reel/Df086IKj9dl/",
-      "audio": "November Magic — Peaceful Reveries"
+      "audio": "November Magic \u2014 Peaceful Reveries"
     },
     {
       "date": "2026-11-17",
@@ -20,7 +21,7 @@
       "hook": "Never chase moving lines",
       "media_id": "18098279555678467",
       "permalink": "https://www.instagram.com/reel/Df2nMJHjh1z/",
-      "audio": "What's Up Been A Minute — DRILLTECHANTS"
+      "audio": "What's Up Been A Minute \u2014 DRILLTECHANTS"
     },
     {
       "date": "2026-11-17",
@@ -30,6 +31,15 @@
       "media_id": "18114190340228052",
       "permalink": "https://www.instagram.com/reel/Df3Acmsjg35/",
       "audio": null
+    },
+    {
+      "date": "2026-11-17",
+      "slot": "primetime",
+      "game": "NBA-401910005",
+      "hook": "The number is lying",
+      "media_id": "18148266580597748",
+      "permalink": "https://www.instagram.com/reel/Df3VC-Yge4R/",
+      "audio": "MY LITTLE MIRACLE (feat. ZVC) \u2014 Forrest Frank, ZVC"
     }
   ],
   "broll_used": [
@@ -45,6 +55,10 @@
     "px202104",
     "px230749",
     "px202102",
-    "px327898"
+    "px327898",
+    "px8880",
+    "px208442",
+    "px43594",
+    "px26351"
   ]
 }
