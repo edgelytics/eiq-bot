@@ -40,6 +40,21 @@
       "media_id": "18148266580597748",
       "permalink": "https://www.instagram.com/reel/Df3VC-Yge4R/",
       "audio": "MY LITTLE MIRACLE (feat. ZVC) \u2014 Forrest Frank, ZVC"
+    },
+    {
+      "date": "2026-11-18",
+      "slot": "midday",
+      "game": "explainer-lineshop",
+      "hook": "SAME BET. BETTER PRICE.",
+      "kind": "explainer",
+      "topic": "lineshop",
+      "voice": "am_fenrir",
+      "theme": "clean",
+      "media_id": "18097205279182211",
+      "permalink": "https://www.instagram.com/reel/Df5C6JaDAET/",
+      "audio": "Party With The Boys \u2014 Don Toliver (NOT attached by Instagram)",
+      "audio_type": "ORIGINAL_SOUND",
+      "music_attached": false
     }
   ],
   "broll_used": [
@@ -63,10 +78,15 @@
     "px23258",
     "px3176",
     "px202987",
-    "px6395"
+    "px6395",
+    "px7093",
+    "px11721",
+    "px3627",
+    "px21116"
   ],
   "ig_music": {
-    "strategy": "json",
-    "fails": 0
+    "strategy": "loop",
+    "fails": 1,
+    "last_fail": "2026-11-18"
   }
 }
