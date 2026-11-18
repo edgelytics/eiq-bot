@@ -59,6 +59,10 @@ def collect():
         rows = []
         for m in media.get("data", []):
             ins = _insights(m["id"])
+            try:
+                atype = _get(f"{G}/{m['id']}", fields="media_audio_type").get("media_audio_type")
+            except RuntimeError:
+                atype = None
             rows.append({
                 "id": m["id"], "permalink": m.get("permalink"), "timestamp": m.get("timestamp"),
                 "type": m.get("media_product_type"), "thumb": m.get("thumbnail_url"),
@@ -66,6 +70,7 @@ def collect():
                 "likes": m.get("like_count", 0), "comments": m.get("comments_count", 0),
                 "views": ins.get("views", 0), "reach": ins.get("reach", 0), "saves": ins.get("saved", 0),
                 "shares": ins.get("shares", 0), "interactions": ins.get("total_interactions", 0),
+                "audio_type": atype,
             })
         out["media"] = rows
         if INS_ERR and not any(r["views"] or r["reach"] for r in rows):
