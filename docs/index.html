@@ -44,6 +44,8 @@ h1{font-size:20px;margin:0;font-weight:800;letter-spacing:-.01em}
 .slot b{display:block;font-size:15px}
 .slot.done{border-color:#16a34a66;background:#16a34a14}.slot.next{border-color:var(--lime)}
 .ctl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.sel{width:100%;min-height:44px;border-radius:10px;background:#181b19;border:1px solid var(--line);padding:0 12px;margin-top:4px}
+.tagchip{display:inline-block;font-size:11px;padding:1px 7px;border-radius:99px;border:1px solid var(--line);color:var(--dim);margin-right:4px}
 .ctl select{grid-column:1/-1;min-height:44px;border-radius:10px;background:#181b19;border:1px solid var(--line);padding:0 12px}
 .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:18px}
 @media(max-width:700px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -137,6 +139,26 @@ dialog input{width:100%;min-height:44px;border-radius:10px;background:#0b0d0c;bo
 
     <aside class="side">
       <section class="card" id="needs"><h2>Needs your attention</h2><div id="alerts"></div></section>
+      <section class="card" id="style">
+        <h2>Voice &amp; design</h2>
+        <label class="small" for="voicesel">Narrator</label>
+        <select id="voicesel" class="sel"></select>
+        <label class="small" for="themesel" style="display:block;margin-top:10px">Reel design</label>
+        <select id="themesel" class="sel"></select>
+        <div style="display:flex;gap:8px;margin-top:12px;align-items:center;flex-wrap:wrap">
+          <button class="btn go" data-act="style">Save</button>
+          <span class="small" id="stylenote">"Rotate" switches it up every post.</span>
+        </div>
+      </section>
+      <section class="card" id="lessons">
+        <h2>Lesson reels</h2>
+        <p class="small" style="margin:0 0 10px">60-second explainers that plug Edgelytics IQ. One goes out automatically every other day at midday — or post one now.</p>
+        <select id="topicsel" class="sel"></select>
+        <div class="ctl" style="margin-top:10px">
+          <button class="btn go" data-act="lesson">Post lesson now</button>
+          <button class="btn" data-act="lessontest">Preview only</button>
+        </div>
+      </section>
       <section class="card" id="teach">
         <h2>Teach the bot</h2>
         <textarea id="idea" placeholder="e.g. Do more NBA player-prop explainers on Tuesdays"></textarea>
@@ -170,6 +192,12 @@ const R = "edgelytics/eiq-bot", API = "https://api.github.com/repos/" + R;
 const RAW = "https://raw.githubusercontent.com/" + R + "/main/";
 const TZ = "America/Chicago", IG_TOKEN_EXPIRES = "2027-01-15";
 const SLOTS = [["midday","11:30"],["afternoon","16:30"],["primetime","19:30"]];
+const VOICES = {auto: "Rotate voices (recommended)", am_michael: "Michael — deep, confident", am_fenrir: "Fenrir — punchy hype",
+  am_puck: "Puck — energetic", am_onyx: "Onyx — smooth, low", af_heart: "Heart — warm female", af_bella: "Bella — bright female"};
+const THEMES = {auto: "Rotate designs (recommended)", eiq: "EIQ Classic — green", neon: "Neon Night — cyan & yellow",
+  gold: "Gold Rush — black & gold", heat: "Heat Check — orange", clean: "Clean Card — white captions"};
+const TOPICS = {"": "Next in rotation", arb: "Arbitrage in 60 seconds", lineshop: "How to line shop", vig: "What the vig costs you",
+  clv: "Closing line value", keynums: "NFL key numbers", readodds: "How to read betting odds"};
 const APPS = [
   ["Instagram","https://www.instagram.com/edgelytics.iq/","#e1306c","IG"],
   ["Website","https://edgelytics.github.io/edgelytics-site/","#16a34a","W"],
@@ -187,7 +215,7 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmt = n => n == null ? "—" : n >= 1e6 ? (n/1e6).toFixed(1)+"M" : n >= 1e4 ? (n/1e3).toFixed(1)+"K" : Number(n).toLocaleString();
 let key = ""; try { key = localStorage.getItem("eiq_pat") || ""; } catch (e) {}
-let S = { posted: null, metrics: null, runs: [], autopost: null };
+let S = { posted: null, metrics: null, runs: [], autopost: null, voice: "auto", theme: "auto" };
 let tab = "posts";
 
 function toast(msg){ const t=$("#toast"); t.textContent=msg; t.style.display="block"; clearTimeout(t._h); t._h=setTimeout(()=>t.style.display="none",4200); }
@@ -305,7 +333,8 @@ function renderList() {
   box.innerHTML = items.length ? items.slice(0, 25).map(it => { const m = it.m || {};
     return `<div class="row"><div class="thumb" ${m.thumb ? `style="background-image:url('${esc(m.thumb)}')"` : ""}></div>
       <div style="min-width:0"><div class="t">${esc(it.hook || m.caption || it.game || "Reel")}</div>
-      <div class="m">${it.manual ? "posted by you" : esc(it.date + " · " + it.slot)}${it.audio ? " · ♪ " + esc(it.audio) : ""}</div></div>
+      <div class="m">${it.manual ? "posted by you" : esc(it.date + " · " + it.slot)}${it.audio ? " · ♪ " + esc(it.audio) : ""}</div>
+      <div>${it.kind === "explainer" ? `<span class="tagchip">lesson: ${esc(TOPICS[it.topic] || it.topic)}</span>` : ""}${it.voice ? `<span class="tagchip">🎙 ${esc((VOICES[it.voice] || it.voice).split(" —")[0])}</span>` : ""}${it.theme ? `<span class="tagchip">🎨 ${esc((THEMES[it.theme] || it.theme).split(" —")[0])}</span>` : ""}${m.audio_type === "MUSIC" ? `<span class="tagchip">🎵 song attached</span>` : m.audio_type === "ORIGINAL_SOUND" ? `<span class="tagchip" style="color:var(--amber)">no Instagram song</span>` : ""}</div></div>
       <div class="nums">${m.views != null ? `<b>${fmt(m.views)}</b> views<br>${fmt(m.likes)} ♥ · ${fmt(m.comments)} 💬` : `<span class="small">stats soon</span>`}<br>${it.permalink || m.permalink ? `<a href="${esc(it.permalink || m.permalink)}">View ↗</a>` : ""}</div></div>`; }).join("") : `<div class="empty">No posts yet.</div>`;
 }
 function renderAlerts() {
@@ -316,10 +345,13 @@ function renderAlerts() {
   if (last && last.conclusion !== "success") a.push(["bad", "The last bot run failed.", last.html_url, "See what broke"]);
   if (S.autopost === false) a.push(["warn", "The bot is paused — nothing will post.", "act:pause", "Resume"]);
   if (S.metrics?.error) a.push(["warn", "Instagram stats error: " + S.metrics.error, null]);
+  const byLink2 = Object.fromEntries((S.metrics?.media || []).map(m => [m.permalink, m]));
+  const lastSong = [...posts].reverse().find(p => p.permalink && byLink2[p.permalink] && p.audio && !/built-in/.test(p.audio));
+  if (lastSong && byLink2[lastSong.permalink].audio_type === "ORIGINAL_SOUND")
+    a.push(["warn", "Instagram didn't attach the song on the last reel — the bot is trying another method automatically (and falls back to its own beat).", null]);
   const days = Math.round((new Date(IG_TOKEN_EXPIRES) - Date.now()) / 864e5);
   if (days < 21) a.push([days < 7 ? "bad" : "warn", `Instagram token expires in ${days} days.`, "https://developers.facebook.com/tools/explorer/", "Renew"]);
   if (!key) a.push(["warn", "Connect your GitHub key to use the buttons.", "act:key", "Connect"]);
-  a.push(["warn", "Live odds from multiple books: add an ODDSPAPI_KEY secret.", "https://github.com/edgelytics/eiq-bot/settings/secrets/actions", "Add key"]);
   if (!a.some(x => x[0] === "bad")) a.unshift(["ok", "All systems normal.", null]);
   $("#alerts").innerHTML = a.map(([k, t, href, lbl]) => `<div class="alert ${k}"><i></i><div>${esc(t)}${href ? ` <a href="${href.startsWith("http") ? esc(href) : "#"}" data-go="${esc(href)}">${esc(lbl)}</a>` : ""}</div></div>`).join("");
 }
@@ -331,6 +363,11 @@ async function dispatch(inputs, label) {
   toast(label + " — started. It shows under Bot runs in a few seconds.");
   setTimeout(loadRuns, 6000); setTimeout(loadRuns, 20000);
 }
+async function setVar(name, value) {
+  const ex = await gh("/actions/variables/" + name);
+  if (ex) await gh("/actions/variables/" + name, { method: "PATCH", body: JSON.stringify({ name, value }) });
+  else await gh("/actions/variables", { method: "POST", body: JSON.stringify({ name, value }) });
+}
 async function act(kind, arg) {
   try {
     const slot = arg || $("#slotsel").value;
@@ -338,6 +375,17 @@ async function act(kind, arg) {
     if (kind === "test") return dispatch({ slot, post_now: "true", dry_run: "true", mode: "post" }, "Test video build (not posted)");
     if (kind === "metrics") return dispatch({ mode: "metrics" }, "Refreshing stats");
     if (kind === "key") return openKey();
+    if (kind === "lesson" || kind === "lessontest") {
+      const topic = $("#topicsel").value;
+      return dispatch({ slot: "extra", post_now: "true", dry_run: kind === "lesson" ? "false" : "true", mode: "post", kind: "explainer", topic },
+        kind === "lesson" ? `Posting lesson: ${TOPICS[topic]}` : `Building preview: ${TOPICS[topic]} (open it under Bot runs → the run → Artifacts)`);
+    }
+    if (kind === "style") {
+      if (!key) return openKey();
+      S.voice = $("#voicesel").value; S.theme = $("#themesel").value;
+      await setVar("EIQ_VOICE", S.voice); await setVar("EIQ_THEME", S.theme);
+      return toast("Saved — the next reel uses: " + VOICES[S.voice].split(" —")[0] + " · " + THEMES[S.theme].split(" —")[0]);
+    }
     if (kind === "pause") {
       if (!key) return openKey();
       const val = S.autopost === false ? "true" : "false";
@@ -376,9 +424,18 @@ async function loadRuns() { try { const j = await gh("/actions/runs?per_page=15"
 async function load() {
   const [posted, metrics] = await Promise.all([readJSON("state/posted.json"), readJSON("state/metrics.json")]);
   S.posted = posted; S.metrics = metrics;
-  if (key) { try { const v = await gh("/actions/variables/AUTOPOST"); S.autopost = v ? v.value !== "false" : true; } catch (e) { toast(e.message); } }
+  if (key) {
+    try {
+      const [v, vo, th] = await Promise.all(["AUTOPOST", "EIQ_VOICE", "EIQ_THEME"].map(n => gh("/actions/variables/" + n)));
+      S.autopost = v ? v.value !== "false" : true;
+      S.voice = vo ? vo.value : "auto"; S.theme = th ? th.value : "auto"; fillStyle();
+    } catch (e) { toast(e.message); }
+  }
   render(); loadRuns();
 }
+const opts = (o, v) => Object.entries(o).map(([k, n]) => `<option value="${k}" ${k === v ? "selected" : ""}>${n}</option>`).join("");
+function fillStyle() { $("#voicesel").innerHTML = opts(VOICES, S.voice); $("#themesel").innerHTML = opts(THEMES, S.theme); }
+fillStyle(); $("#topicsel").innerHTML = opts(TOPICS, "");
 $("#dock").innerHTML = APPS.map(([n, u, c, i]) => `<a class="app" href="${u}" target="_blank" rel="noopener"><span style="background:${c}">${i}</span>${n}</a>`).join("");
 tickClock(); setInterval(tickClock, 1000);
 load(); setInterval(load, 5 * 60e3);
