@@ -172,9 +172,10 @@ def post_reel(post_mp4, preview_mp4, caption, track=None, strategy="json"):
                 res["music_attached"] = atype == "MUSIC" if atype else None
                 print(f"[publish] Instagram reports audio type: {atype} (strategy={strategy}, {how})")
             return res
-        except IGError as e:
-            print(f"[publish] attempt with {label} failed: {e}")
-            last = e
+        except Exception as e:                # any failure (git, network, Instagram) -> try the next way
+            msg = str(e).replace(IG_TOKEN or "\0", "***").replace(os.environ.get("GITHUB_TOKEN") or "\0", "***")
+            print(f"[publish] attempt with {label} ({how}) failed: {type(e).__name__}: {msg[:400]}")
+            last = e if isinstance(e, IGError) else IGError(msg[:400])
     raise last
 
 
