@@ -73,6 +73,11 @@ FORMATS = {
                 "to the spread or total. Be specific about the player and status."),
     "model":   ("Model vs Market", "Compare ESPN's win probability with what the betting line implies. "
                 "Say which side the gap points to and why that might be."),
+    "pick":    ("Our Play Tonight", "The owner's pick is in game.pick — make the WHOLE reel about it. Hook names the "
+                "player and the number (e.g. 'Ajay Mitchell over 17.5'). Back it with facts.player (his real recent "
+                "numbers, how often he's gone over this line) plus injuries/news from the game facts. Present it as "
+                "our play and the reasoning — confident, never 'lock' or 'guaranteed', and remind them to shop the line. "
+                "Only quote numbers that are in the data. CTA: 'Over or under? Comment.'"),
     "matchup": ("Sharp Angle", "Find the single most interesting fact in the data and build the whole reel around it."),
 }
 
@@ -383,6 +388,20 @@ def template_script(g, fmt="matchup", recent_hooks=()):
         scenes.append({"type": "matchup", "vo": f"The betting market has it {fav}. Compare that to the model before you lay anything."})
         scenes.append({"type": "point", "vo": "When the model and the market disagree, one of them is wrong. Your job is figuring out which.",
                        "eyebrow": "The gap", "text": "Model vs the market"})
+    pk = g.get("pick") or {}
+    if fmt == "pick" and pk:
+        pl = f.get("player") or {}
+        nm, ln, st = pk["player"], pk.get("line"), pk.get("stat", "points")
+        hook = {"type": "hook", "vo": f"Our play {when}: {nm}, over {ln:g} {st}.",
+                "text": f"{nm.split()[-1]} over {ln:g}", "accent": "over", "tag": "OUR PLAY TONIGHT"}
+        if pl.get("last_10_avg") is not None:
+            scenes.append({"type": "point", "vo": f"He's averaging {pl['last_10_avg']:g} {st} over his last ten, "
+                           f"{pl['season_avg']:g} on the season. He's cleared {ln:g} in {pl.get('went_over_line_last_10')} of those games.",
+                           "eyebrow": "Last 10 games", "text": f"{pl['last_10_avg']:g} {st} per game"})
+        scenes.append({"type": "matchup", "vo": f"{a['short']} at {h['short']}, {when}. {fav}."})
+        scenes.append({"type": "point", "vo": f"Shop it before you bet. Some books will hang {ln:g}, some {ln + 1:g}. That half point matters.",
+                       "eyebrow": "Shop the line", "text": "Find the best number"})
+        q = None
     if not hook:
         hook = {"type": "hook", "vo": f"{a['short']} at {h['short']} {when}. Here's the one number that matters.",
                 "text": f"{a['short']} at {h['short']}", "accent": h["short"].split()[-1]}
@@ -396,7 +415,7 @@ def template_script(g, fmt="matchup", recent_hooks=()):
         fv = lines["best_home" if lines.get("home_favored") else "best_away"]
         scenes.append({"type": "books", "label": "Same game, different price",
                        "vo": f"And shop it. Best number on the favorite is {fv['spread']:+g} at {fv['book']}."})
-    q = _rnd.choice([f"Who are you taking, {a['short']} or {h['short']}? Comment and follow.",
+    q = f"{pk['player']} over or under {pk['line']:g}? Comment, and follow for more." if fmt == "pick" and pk else _rnd.choice([f"Who are you taking, {a['short']} or {h['short']}? Comment and follow.",
                      f"Does this change your {h['short']} bet? Tell me below, and follow for more.",
                      f"{a['short']} or {h['short']}? Drop it in the comments and follow."])
     return {
