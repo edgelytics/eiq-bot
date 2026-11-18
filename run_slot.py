@@ -55,6 +55,29 @@ def lru(options, posts, field, forced="auto"):
     return min(opts, key=lambda k: last.get(k, -1))
 
 
+def load_special(now, slot):
+    """special.json = a one-off post the owner asked for (a pick for a specific game, at a specific time)."""
+    try:
+        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "special.json")) as f:
+            sp = json.load(f)
+    except (FileNotFoundError, ValueError):
+        return None
+    if sp.get("date") == str(now.date()) and sp.get("slot") == slot["name"]:
+        return sp
+    return None
+
+
+def find_special_game(sp):
+    from trends import fetch_league, when_label, score
+    want = {t.upper() for t in sp["teams"]}
+    for g in fetch_league(sp["league"]):
+        if g.get("away") and g.get("home") and {g["away"]["abbr"].upper(), g["home"]["abbr"].upper()} == want:
+            g["trend_score"] = score(g)
+            g["when"] = when_label(g["start"])
+            return g
+    return None
+
+
 def upcoming_slot(now):
     """Slot whose post time is between 10 min ago and 50 min from now."""
     for sl in config.SLOTS:
@@ -92,6 +115,12 @@ def main():
             return 0
         if a.now:
             post_at = now
+    special = load_special(now, slot)
+    if special:
+        hh, mm = map(int, special["post_ct"].split(":"))
+        if not a.now:
+            post_at = now.replace(hour=hh, minute=mm, second=0, microsecond=0)
+        print(f"[run] SPECIAL POST from the owner: {special['pick']} ({' @ '.join(special['teams'])})")
     print(f"[run] slot={slot['name']} post_at={post_at:%Y-%m-%d %H:%M %Z} dry={dry}")
 
     state = load_state()
@@ -101,6 +130,8 @@ def main():
 
     # 0) what kind of reel, which voice, which design
     kind = config.KIND_CHOICE if config.KIND_CHOICE in ("game", "explainer") else "auto"
+    if special:
+        kind = "game"
     if kind == "auto":
         n = config.EXPLAINER_EVERY_N_DAYS
         kind = "explainer" if (slot["name"] == config.EXPLAINER_SLOT and n and today.toordinal() % n == 0) else "game"
@@ -113,7 +144,12 @@ def main():
     if kind == "game":
         if a.sample:
             game = SAMPLE_GAME
-        else:
+        elif special:
+            game = find_special_game(special)
+            if not game:
+                print("[run] couldn't find the owner's game on ESPN — falling back to the normal pick")
+                special = None
+        if game is None and not a.sample:
             recent = [gid for gid, d in state["games"].items()
                       if (today - dt.date.fromisoformat(d)).days < 3]
             games = get_trending(config.LEAGUES, exclude_ids=recent, top_n=5) or get_trending(config.LEAGUES, top_n=5)
@@ -141,6 +177,16 @@ def main():
         recent_lines = [p.get("vo") for p in state["posts"][-6:] if p.get("vo")]
         from writer import eligible_formats
         fmt = lru(eligible_formats(game), state["posts"], "format")
+        if special:
+            from enrich import player_facts
+            game["pick"] = special
+            try:
+                pf = player_facts(special["player"], special["league"], special.get("stat", "points"), special.get("line"))
+                if pf:
+                    game.setdefault("facts", {})["player"] = pf
+            except Exception as e:
+                print(f"[run] player stats failed ({e})")
+            fmt = "pick"
         print(f"[run] format={fmt} (options: {', '.join(eligible_formats(game))})")
         script = write_script(game, slot["angle"], recent_hooks, fmt, recent_lines)
         print(f"[run] script by {script.get('writer')}: " + " / ".join(sc["vo"] for sc in script["scenes"])[:600])
