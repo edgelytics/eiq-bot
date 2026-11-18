@@ -47,6 +47,7 @@ jobs:
       ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
       ODDSPAPI_KEY: ${{ secrets.ODDSPAPI_KEY }}
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      GITHUB_TOKEN: ${{ github.token }}              # lets the bot host the reel briefly for Instagram
       AUTOPOST: ${{ vars.AUTOPOST || 'true' }}      # repo variable = your kill switch
       DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
       EIQ_VOICE: ${{ vars.EIQ_VOICE || 'auto' }}     # dashboard: pin a voice or rotate
