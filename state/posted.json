@@ -82,10 +82,14 @@
     "px7093",
     "px11721",
     "px3627",
-    "px21116"
+    "px21116",
+    "px30935",
+    "px30932",
+    "px26352",
+    "px189048"
   ],
   "ig_music": {
-    "strategy": "loop",
+    "strategy": "url",
     "fails": 1,
     "last_fail": "2026-11-18"
   }
