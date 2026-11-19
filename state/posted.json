@@ -4,7 +4,8 @@
     "NBA-401910004": "2026-11-17",
     "NHL-401892741": "2026-11-17",
     "NBA-401910005": "2026-11-17",
-    "NBA-401910015": "2026-11-18"
+    "NBA-401910015": "2026-11-18",
+    "NBA-401910014": "2026-11-18"
   },
   "posts": [
     {
@@ -71,6 +72,24 @@
       "audio": "Party With The Boys \u2014 Don Toliver",
       "audio_type": "MUSIC",
       "music_attached": true
+    },
+    {
+      "date": "2026-11-18",
+      "slot": "primetime",
+      "game": "NBA-401910014",
+      "hook": "Ajay Mitchell over 17.5 points",
+      "kind": "game",
+      "topic": null,
+      "format": "pick",
+      "writer": "ai",
+      "vo": "Ajay Mitchell over seventeen point five points is our play tonight. With Jalen Williams and Chet Holmgren ruled out, Mitchell gets extra usage. He averages twenty point one points over his last ten, going over in six of ten. Always shop for the best price. Over or under on Mitchell tonight? Comment below.",
+      "voice": "af_heart",
+      "theme": "eiq",
+      "media_id": "18094887767208238",
+      "permalink": "https://www.instagram.com/reel/Df5y-uPjjLy/",
+      "audio": "Party With The Boys \u2014 Don Toliver",
+      "audio_type": "MUSIC",
+      "music_attached": true
     }
   ],
   "broll_used": [
@@ -110,7 +129,11 @@
     "px30940",
     "px208442",
     "px202104",
-    "px43594"
+    "px43594",
+    "px202104",
+    "px30940",
+    "px43593",
+    "px26352"
   ],
   "ig_music": {
     "strategy": "url",
