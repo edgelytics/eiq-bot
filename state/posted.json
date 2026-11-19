@@ -6,7 +6,8 @@
     "NBA-401910005": "2026-11-17",
     "NBA-401910015": "2026-11-18",
     "NBA-401910014": "2026-11-18",
-    "CFB-401862830": "2026-11-19"
+    "CFB-401862830": "2026-11-19",
+    "NFL-401873066": "2026-11-19"
   },
   "posts": [
     {
@@ -109,6 +110,24 @@
       "audio": "GTA 6 (Grand Theft Auto Six Song) \u2014 AURIX232",
       "audio_type": "MUSIC",
       "music_attached": true
+    },
+    {
+      "date": "2026-11-19",
+      "slot": "afternoon",
+      "game": "NFL-401873066",
+      "hook": "Colts Secondary Battered Tonight",
+      "kind": "game",
+      "topic": null,
+      "format": "injury",
+      "writer": "ai",
+      "vo": "Charvarius Ward is out and Sauce Gardner is questionable tonight for Indy. This spread skyrocketed from Houston minus five and a half up to minus twelve and a half. ESPN's model gives the Texans a seventy-four point seven percent chance to win tonight. Is twelve and a half too many points for Houston to cover in a division game?",
+      "voice": "am_puck",
+      "theme": "heat",
+      "media_id": "18291413437289900",
+      "permalink": "https://www.instagram.com/reel/Df8KEFAoPrJ/",
+      "audio": "Montana talk \u2014 Southside Leeek",
+      "audio_type": "MUSIC",
+      "music_attached": true
     }
   ],
   "broll_used": [
@@ -153,6 +172,7 @@
     "px30940",
     "px43593",
     "px26352",
+    "px143853",
     "px143853"
   ],
   "ig_music": {
