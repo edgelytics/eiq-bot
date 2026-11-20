@@ -147,6 +147,24 @@
       "audio": "Party With The Boys \u2014 Don Toliver",
       "audio_type": "MUSIC",
       "music_attached": true
+    },
+    {
+      "date": "2026-11-20",
+      "slot": "midday",
+      "game": "explainer-clv",
+      "hook": "HOW PROS GRADE BETS",
+      "kind": "explainer",
+      "topic": "clv",
+      "format": null,
+      "writer": null,
+      "vo": "Pros don't judge a bet by whether it won. They judge it by this. Say you bet a team at minus three. By kickoff the line closes at minus four and a half. You got a better number than the market's final price. That's closing line value. The closing line has the most information baked in. Beating it consistently is the best predictor of long-term profit. How to get it: bet before the market moves, an",
+      "voice": "am_fenrir",
+      "theme": "gold",
+      "media_id": "18071721608788228",
+      "permalink": "https://www.instagram.com/reel/Df-NVNkGvr5/",
+      "audio": "RHYNO (from GTAVI: The Album) \u2014 Travis Scott, Grand Theft Auto VI",
+      "audio_type": "MUSIC",
+      "music_attached": true
     }
   ],
   "broll_used": [
@@ -193,6 +211,7 @@
     "px26352",
     "px143853",
     "px143853",
+    "px143853",
     "px143853"
   ],
   "ig_music": {
@@ -200,6 +219,6 @@
     "fails": 0,
     "last_fail": "2026-11-18",
     "tried_url": true,
-    "last_ok": "2026-11-19"
+    "last_ok": "2026-11-20"
   }
 }
