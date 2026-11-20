@@ -7,7 +7,8 @@
     "NBA-401910015": "2026-11-18",
     "NBA-401910014": "2026-11-18",
     "CFB-401862830": "2026-11-19",
-    "NFL-401873066": "2026-11-19"
+    "NFL-401873066": "2026-11-19",
+    "CFB-401856754": "2026-11-19"
   },
   "posts": [
     {
@@ -128,6 +129,24 @@
       "audio": "Montana talk \u2014 Southside Leeek",
       "audio_type": "MUSIC",
       "music_attached": true
+    },
+    {
+      "date": "2026-11-19",
+      "slot": "primetime",
+      "game": "CFB-401856754",
+      "hook": "Tennessee line flips against LSU",
+      "kind": "game",
+      "topic": null,
+      "format": "report",
+      "writer": "ai",
+      "vo": "Tennessee just flipped to a favorite on Saturday against LSU. With ESPN reporting major SEC contract fallout, market action is moving fast. The Volunteers opened at plus one and a half and moved to minus one and a half. Yet ESPN's model gives LSU a fifty point one percent chance to win. Are you taking LSU as short dogs or Tennessee on Saturday?",
+      "voice": "af_bella",
+      "theme": "clean",
+      "media_id": "17911070406332952",
+      "permalink": "https://www.instagram.com/reel/Df8epJGjbW1/",
+      "audio": "Party With The Boys \u2014 Don Toliver",
+      "audio_type": "MUSIC",
+      "music_attached": true
     }
   ],
   "broll_used": [
@@ -172,6 +191,7 @@
     "px30940",
     "px43593",
     "px26352",
+    "px143853",
     "px143853",
     "px143853"
   ],
