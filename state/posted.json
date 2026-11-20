@@ -8,7 +8,8 @@
     "NBA-401910014": "2026-11-18",
     "CFB-401862830": "2026-11-19",
     "NFL-401873066": "2026-11-19",
-    "CFB-401856754": "2026-11-19"
+    "CFB-401856754": "2026-11-19",
+    "NBA-401909312": "2026-11-20"
   },
   "posts": [
     {
@@ -165,6 +166,24 @@
       "audio": "RHYNO (from GTAVI: The Album) \u2014 Travis Scott, Grand Theft Auto VI",
       "audio_type": "MUSIC",
       "music_attached": true
+    },
+    {
+      "date": "2026-11-20",
+      "slot": "afternoon",
+      "game": "NBA-401909312",
+      "hook": "ESPN Model Disagrees With Nuggets",
+      "kind": "game",
+      "topic": null,
+      "format": "model",
+      "writer": "ai",
+      "vo": "ESPN's model hates Denver tonight against Houston. Denver opened as three and a half point favorites, but DraftKings trimmed it to minus one and a half. At minus one and a half, the market implies Denver wins about fifty-four percent. ESPN's model gives Denver just fifty-one point three percent. That gap points directly to twelve and four Houston. Are you taking the Rockets tonight?",
+      "voice": "am_onyx",
+      "theme": "eiq",
+      "media_id": "17965309752239998",
+      "permalink": "https://www.instagram.com/reel/Df-u5o4kxLf/",
+      "audio": "GTA 6 (Grand Theft Auto Six Song) \u2014 AURIX232",
+      "audio_type": "MUSIC",
+      "music_attached": true
     }
   ],
   "broll_used": [
@@ -212,7 +231,11 @@
     "px143853",
     "px143853",
     "px143853",
-    "px143853"
+    "px143853",
+    "px43593",
+    "px30940",
+    "px202104",
+    "px8880"
   ],
   "ig_music": {
     "strategy": "url",
