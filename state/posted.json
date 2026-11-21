@@ -10,7 +10,8 @@
     "NFL-401873066": "2026-11-19",
     "CFB-401856754": "2026-11-19",
     "NBA-401909312": "2026-11-20",
-    "CFB-401856870": "2026-11-20"
+    "CFB-401856870": "2026-11-20",
+    "CFB-401862833": "2026-11-21"
   },
   "posts": [
     {
@@ -203,6 +204,24 @@
       "audio": "GTA 6 (Grand Theft Auto Six Song) \u2014 AURIX232",
       "audio_type": "MUSIC",
       "music_attached": true
+    },
+    {
+      "date": "2026-11-21",
+      "slot": "midday",
+      "game": "CFB-401862833",
+      "hook": "FAU Flips To Underdog",
+      "kind": "game",
+      "topic": null,
+      "format": "report",
+      "writer": "ai",
+      "vo": "FAU just flipped to an underdog today. With ESPN reporting Week 12 conference title scenarios, market action moved fast. FAU opened minus one and a half, but South Florida is now minus one and a half. The total also plunged from sixty-nine and a half down to sixty-three and a half. Is USF the right side on the road today?",
+      "voice": "am_michael",
+      "theme": "heat",
+      "media_id": "18387833590236584",
+      "permalink": "https://www.instagram.com/reel/DgAxTMuEdT_/",
+      "audio": "RHYNO (from GTAVI: The Album) \u2014 Travis Scott, Grand Theft Auto VI",
+      "audio_type": "MUSIC",
+      "music_attached": true
     }
   ],
   "broll_used": [
@@ -255,6 +274,7 @@
     "px30940",
     "px202104",
     "px8880",
+    "px143853",
     "px143853"
   ],
   "ig_music": {
@@ -262,6 +282,6 @@
     "fails": 0,
     "last_fail": "2026-11-18",
     "tried_url": true,
-    "last_ok": "2026-11-20"
+    "last_ok": "2026-11-21"
   }
 }
