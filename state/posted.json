@@ -9,7 +9,8 @@
     "CFB-401862830": "2026-11-19",
     "NFL-401873066": "2026-11-19",
     "CFB-401856754": "2026-11-19",
-    "NBA-401909312": "2026-11-20"
+    "NBA-401909312": "2026-11-20",
+    "CFB-401856870": "2026-11-20"
   },
   "posts": [
     {
@@ -184,6 +185,24 @@
       "audio": "GTA 6 (Grand Theft Auto Six Song) \u2014 AURIX232",
       "audio_type": "MUSIC",
       "music_attached": true
+    },
+    {
+      "date": "2026-11-20",
+      "slot": "primetime",
+      "game": "CFB-401856870",
+      "hook": "Oklahoma State Line Dropping",
+      "kind": "game",
+      "topic": null,
+      "format": "move",
+      "writer": "ai",
+      "vo": "Oklahoma State's line at Arizona State is dropping fast for tomorrow night. DraftKings opened the Cowboys at minus four, but it's down to minus two and a half. Moving through three wipes out the best Arizona State value. Plus, ESPN's model gives Oklahoma State a sixty-seven point eight percent win chance. Are you laying two and a half with the Cowboys tomorrow night?",
+      "voice": "af_heart",
+      "theme": "neon",
+      "media_id": "18086609507356046",
+      "permalink": "https://www.instagram.com/reel/Df_Db_xjd_E/",
+      "audio": "GTA 6 (Grand Theft Auto Six Song) \u2014 AURIX232",
+      "audio_type": "MUSIC",
+      "music_attached": true
     }
   ],
   "broll_used": [
@@ -235,7 +254,8 @@
     "px43593",
     "px30940",
     "px202104",
-    "px8880"
+    "px8880",
+    "px143853"
   ],
   "ig_music": {
     "strategy": "url",
