@@ -11,7 +11,8 @@
     "CFB-401856754": "2026-11-19",
     "NBA-401909312": "2026-11-20",
     "CFB-401856870": "2026-11-20",
-    "CFB-401862833": "2026-11-21"
+    "CFB-401862833": "2026-11-21",
+    "CFB-401858307": "2026-11-21"
   },
   "posts": [
     {
@@ -222,6 +223,24 @@
       "audio": "RHYNO (from GTAVI: The Album) \u2014 Travis Scott, Grand Theft Auto VI",
       "audio_type": "MUSIC",
       "music_attached": true
+    },
+    {
+      "date": "2026-11-21",
+      "slot": "afternoon",
+      "game": "CFB-401858307",
+      "hook": "Notre Dame 93% Win Probability",
+      "kind": "game",
+      "topic": null,
+      "format": "model",
+      "writer": "ai",
+      "vo": "ESPN's model gives Notre Dame a ninety-three percent win chance against S M U tonight. DraftKings opened Notre Dame at minus seventeen and a half, but it's moved to minus twenty and a half. Their minus sixteen hundred moneyline matches ESPN's model, but twenty and a half points is a heavy spread. Are you laying twenty and a half with Notre Dame tonight?",
+      "voice": "am_puck",
+      "theme": "clean",
+      "media_id": "18364389964216594",
+      "permalink": "https://www.instagram.com/reel/DgBToZCDAHG/",
+      "audio": "GTA 6 Main Theme (EPIC Version) \u2014 Apex Sound Odyssey",
+      "audio_type": "MUSIC",
+      "music_attached": true
     }
   ],
   "broll_used": [
@@ -274,6 +293,7 @@
     "px30940",
     "px202104",
     "px8880",
+    "px143853",
     "px143853",
     "px143853"
   ],
