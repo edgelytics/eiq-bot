@@ -260,6 +260,24 @@
       "audio": "GTA 6 Main Theme (EPIC Version) \u2014 Apex Sound Odyssey",
       "audio_type": "MUSIC",
       "music_attached": true
+    },
+    {
+      "date": "2026-11-22",
+      "slot": "midday",
+      "game": "explainer-readodds",
+      "hook": "ODDS IN 30 SECONDS",
+      "kind": "explainer",
+      "topic": "readodds",
+      "format": null,
+      "writer": null,
+      "vo": "If betting odds confuse you, this takes thirty seconds. Plus one-fifty: bet a hundred to win one-fifty. Minus one-fifty: bet one-fifty to win a hundred. Plus is the underdog, minus is the favorite. Every price is really a probability. Plus one-fifty implies forty percent. Minus one-fifty implies sixty. You only have an edge when you think the real chance is higher than the price implies. Edgelytic",
+      "voice": "am_fenrir",
+      "theme": "eiq",
+      "media_id": "17993485518118102",
+      "permalink": "https://www.instagram.com/reel/DgDWGVsEaa4/",
+      "audio": "GTA 6 Main Theme (EPIC Version) \u2014 Apex Sound Odyssey",
+      "audio_type": "MUSIC",
+      "music_attached": true
     }
   ],
   "broll_used": [
@@ -315,13 +333,17 @@
     "px143853",
     "px143853",
     "px143853",
-    "px143853"
+    "px143853",
+    "px36510",
+    "px26531",
+    "px3606",
+    "px1694"
   ],
   "ig_music": {
     "strategy": "url",
     "fails": 0,
     "last_fail": "2026-11-18",
     "tried_url": true,
-    "last_ok": "2026-11-21"
+    "last_ok": "2026-11-22"
   }
 }
