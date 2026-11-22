@@ -12,7 +12,8 @@
     "NBA-401909312": "2026-11-20",
     "CFB-401856870": "2026-11-20",
     "CFB-401862833": "2026-11-21",
-    "CFB-401858307": "2026-11-21"
+    "CFB-401858307": "2026-11-21",
+    "NFL-401873076": "2026-11-21"
   },
   "posts": [
     {
@@ -241,6 +242,24 @@
       "audio": "GTA 6 Main Theme (EPIC Version) \u2014 Apex Sound Odyssey",
       "audio_type": "MUSIC",
       "music_attached": true
+    },
+    {
+      "date": "2026-11-21",
+      "slot": "primetime",
+      "game": "NFL-401873076",
+      "hook": "Roman Wilson Returns For Pittsburgh",
+      "kind": "game",
+      "topic": null,
+      "format": "injury",
+      "writer": "ai",
+      "vo": "Steelers receiver Roman Wilson is officially off IR for tomorrow's game in Philadelphia. ESPN confirms Wilson's activation ahead of kickoff. DraftKings opened the Eagles minus five and a half, but Pittsburgh flipped to minus three and a half. Meanwhile, the total crashed from forty-two and a half to thirty-seven and a half. Are you laying the points with Pittsburgh tomorrow?",
+      "voice": "af_bella",
+      "theme": "gold",
+      "media_id": "18151538773565343",
+      "permalink": "https://www.instagram.com/reel/DgBoUregGUY/",
+      "audio": "GTA 6 Main Theme (EPIC Version) \u2014 Apex Sound Odyssey",
+      "audio_type": "MUSIC",
+      "music_attached": true
     }
   ],
   "broll_used": [
@@ -293,6 +312,7 @@
     "px30940",
     "px202104",
     "px8880",
+    "px143853",
     "px143853",
     "px143853",
     "px143853"
