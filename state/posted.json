@@ -16,7 +16,8 @@
     "NFL-401873076": "2026-11-21",
     "NFL-401873077": "2026-11-22",
     "NFL-401873078": "2026-11-22",
-    "NBA-401910037": "2026-11-23"
+    "NBA-401910037": "2026-11-23",
+    "NHL-401892780": "2026-11-23"
   },
   "posts": [
     {
@@ -335,6 +336,24 @@
       "audio": "GTA 6 Main Theme (EPIC Version) \u2014 Apex Sound Odyssey",
       "audio_type": "MUSIC",
       "music_attached": true
+    },
+    {
+      "date": "2026-11-23",
+      "slot": "afternoon",
+      "game": "NHL-401892780",
+      "hook": "Andersen On Edmonton IR",
+      "kind": "game",
+      "topic": null,
+      "format": "injury",
+      "writer": "ai",
+      "vo": "Goalie Frederik Andersen remains on Edmonton's injured reserve before tomorrow night's TNT clash against Vegas. DraftKings opened Edmonton as a minus one-twelve favorite, but Vegas flipped to a minus one-eighteen moneyline favorite. Edmonton's puck line moved to plus one and a half, while the total sits at six and a half. Can Edmonton pull the upset as a dog tomorrow night?",
+      "voice": "am_puck",
+      "theme": "gold",
+      "media_id": "18135651463674659",
+      "permalink": "https://www.instagram.com/reel/DgGdVILnDZ_/",
+      "audio": "GTA 6 Main Theme (EPIC Version) \u2014 Apex Sound Odyssey",
+      "audio_type": "MUSIC",
+      "music_attached": true
     }
   ],
   "broll_used": [
@@ -400,7 +419,8 @@
     "px43593",
     "px208442",
     "px43594",
-    "px8880"
+    "px8880",
+    "px327898"
   ],
   "ig_music": {
     "strategy": "url",
