@@ -15,7 +15,8 @@
     "CFB-401858307": "2026-11-21",
     "NFL-401873076": "2026-11-21",
     "NFL-401873077": "2026-11-22",
-    "NFL-401873078": "2026-11-22"
+    "NFL-401873078": "2026-11-22",
+    "NBA-401910037": "2026-11-23"
   },
   "posts": [
     {
@@ -316,6 +317,24 @@
       "audio": "GTA 6 Main Theme (EPIC Version) \u2014 Apex Sound Odyssey",
       "audio_type": "MUSIC",
       "music_attached": true
+    },
+    {
+      "date": "2026-11-23",
+      "slot": "midday",
+      "game": "NBA-401910037",
+      "hook": "Sixers Line Dropping Tonight",
+      "kind": "game",
+      "topic": null,
+      "format": "model",
+      "writer": "ai",
+      "vo": "Sixers line dropping against Portland tonight. ESPN's model gives Philadelphia a fifty-seven point eight percent win chance tonight. DraftKings opened Philly's moneyline at minus one-forty-four, but it moved down to minus one-thirty-three. That shift aligns the market's price directly with ESPN's fifty-seven percent model projection. With Shaedon Sharpe out for Portland, do you take Philly minus t",
+      "voice": "am_michael",
+      "theme": "clean",
+      "media_id": "18122340103955112",
+      "permalink": "https://www.instagram.com/reel/DgF65O0jpQg/",
+      "audio": "GTA 6 Main Theme (EPIC Version) \u2014 Apex Sound Odyssey",
+      "audio_type": "MUSIC",
+      "music_attached": true
     }
   ],
   "broll_used": [
@@ -377,13 +396,17 @@
     "px3606",
     "px1694",
     "px143853",
-    "px143853"
+    "px143853",
+    "px43593",
+    "px208442",
+    "px43594",
+    "px8880"
   ],
   "ig_music": {
     "strategy": "url",
     "fails": 0,
     "last_fail": "2026-11-18",
     "tried_url": true,
-    "last_ok": "2026-11-22"
+    "last_ok": "2026-11-23"
   }
 }
