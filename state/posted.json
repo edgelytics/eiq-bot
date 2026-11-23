@@ -14,7 +14,8 @@
     "CFB-401862833": "2026-11-21",
     "CFB-401858307": "2026-11-21",
     "NFL-401873076": "2026-11-21",
-    "NFL-401873077": "2026-11-22"
+    "NFL-401873077": "2026-11-22",
+    "NFL-401873078": "2026-11-22"
   },
   "posts": [
     {
@@ -297,6 +298,24 @@
       "audio": "GTA 6 Main Theme (EPIC Version) \u2014 Apex Sound Odyssey",
       "audio_type": "MUSIC",
       "music_attached": true
+    },
+    {
+      "date": "2026-11-22",
+      "slot": "primetime",
+      "game": "NFL-401873078",
+      "hook": "Commanders Line Shifting Fast",
+      "kind": "game",
+      "topic": null,
+      "format": "report",
+      "writer": "ai",
+      "vo": "Huge line movement in Washington for tomorrow night. As ESPN analyzes Week eleven overreactions, DraftKings opened Cincinnati as just a one and a half point favorite. That spread surged to minus six, with ESPN giving Cincinnati a seventy-six percent win chance. Crossing key numbers like three and four signals heavy market confidence in the Bengals. Are you laying six with Cincinnati tomorrow night",
+      "voice": "af_heart",
+      "theme": "heat",
+      "media_id": "18650818240011819",
+      "permalink": "https://www.instagram.com/reel/DgENHEngZ6D/",
+      "audio": "GTA 6 Main Theme (EPIC Version) \u2014 Apex Sound Odyssey",
+      "audio_type": "MUSIC",
+      "music_attached": true
     }
   ],
   "broll_used": [
@@ -357,6 +376,7 @@
     "px26531",
     "px3606",
     "px1694",
+    "px143853",
     "px143853"
   ],
   "ig_music": {
