@@ -17,7 +17,8 @@
     "NFL-401873077": "2026-11-22",
     "NFL-401873078": "2026-11-22",
     "NBA-401910037": "2026-11-23",
-    "NHL-401892780": "2026-11-23"
+    "NHL-401892780": "2026-11-23",
+    "NFL-401873079": "2026-11-23"
   },
   "posts": [
     {
@@ -354,6 +355,24 @@
       "audio": "GTA 6 Main Theme (EPIC Version) \u2014 Apex Sound Odyssey",
       "audio_type": "MUSIC",
       "music_attached": true
+    },
+    {
+      "date": "2026-11-23",
+      "slot": "primetime",
+      "game": "NFL-401873079",
+      "hook": "Rams line dropping fast",
+      "kind": "game",
+      "topic": null,
+      "format": "move",
+      "writer": "ai",
+      "vo": "That Rams minus three and a half is gone. DraftKings opened Los Angeles minus three and a half, but it's sitting at minus two and a half now for Wednesday night. ESPN reports Packers star Micah Parsons has been cleared for his season debut against the Rams. That injury news is exactly why the spread dropped off that key number. Are you taking the points with Green Bay or laying them with LA?",
+      "voice": "af_bella",
+      "theme": "eiq",
+      "media_id": "18018525641755156",
+      "permalink": "https://www.instagram.com/reel/DgGx0fMHxst/",
+      "audio": "GTA 6 Main Theme (EPIC Version) \u2014 Apex Sound Odyssey",
+      "audio_type": "MUSIC",
+      "music_attached": true
     }
   ],
   "broll_used": [
@@ -420,7 +439,8 @@
     "px208442",
     "px43594",
     "px8880",
-    "px327898"
+    "px327898",
+    "px143853"
   ],
   "ig_music": {
     "strategy": "url",
