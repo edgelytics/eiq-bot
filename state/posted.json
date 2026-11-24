@@ -18,7 +18,8 @@
     "NFL-401873078": "2026-11-22",
     "NBA-401910037": "2026-11-23",
     "NHL-401892780": "2026-11-23",
-    "NFL-401873079": "2026-11-23"
+    "NFL-401873079": "2026-11-23",
+    "NFL-401873081": "2026-11-24"
   },
   "posts": [
     {
@@ -391,6 +392,24 @@
       "audio": "AHH YEA \u2014 Playboi Carti",
       "audio_type": "MUSIC",
       "music_attached": true
+    },
+    {
+      "date": "2026-11-24",
+      "slot": "afternoon",
+      "game": "NFL-401873081",
+      "hook": "Bears Lions line completely flipped",
+      "kind": "game",
+      "topic": null,
+      "format": "report",
+      "writer": "ai",
+      "vo": "DraftKings flipped the entire script on Bears and Lions Thursday. ESPN's Week twelve odds report shows the market shifting hard on Detroit. DraftKings opened Detroit minus two and a half, but they are now plus two and a half underdogs at home. Meanwhile, the total surged four full points from fifty-one and a half up to fifty-five and a half. ESPN's model still gives Detroit fifty-five percent win ",
+      "voice": "am_onyx",
+      "theme": "heat",
+      "media_id": "18651143716013160",
+      "permalink": "https://www.instagram.com/reel/DgJCBIelKSd/",
+      "audio": "AHH YEA \u2014 Playboi Carti",
+      "audio_type": "MUSIC",
+      "music_attached": true
     }
   ],
   "broll_used": [
@@ -462,7 +481,8 @@
     "px137265",
     "px3132",
     "px47158",
-    "px8252"
+    "px8252",
+    "px143853"
   ],
   "ig_music": {
     "strategy": "url",
