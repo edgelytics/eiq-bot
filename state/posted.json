@@ -373,6 +373,24 @@
       "audio": "GTA 6 Main Theme (EPIC Version) \u2014 Apex Sound Odyssey",
       "audio_type": "MUSIC",
       "music_attached": true
+    },
+    {
+      "date": "2026-11-24",
+      "slot": "midday",
+      "game": "explainer-vig",
+      "hook": "THE HIDDEN FEE",
+      "kind": "explainer",
+      "topic": "vig",
+      "format": null,
+      "writer": null,
+      "vo": "Every bet you make has a hidden fee. It's called the vig. Minus one-ten on both sides means each side implies fifty-two point four percent. Add them up: one oh four point eight. That extra is the book's cut, about four and a half percent. So at minus one-ten, you have to win fifty-two point four percent of your bets just to break even. The fix: shop for minus one-oh-five or better. Lower juice mea",
+      "voice": "am_fenrir",
+      "theme": "neon",
+      "media_id": "18116161502625304",
+      "permalink": "https://www.instagram.com/reel/DgIfr-lFS3B/",
+      "audio": "AHH YEA \u2014 Playboi Carti",
+      "audio_type": "MUSIC",
+      "music_attached": true
     }
   ],
   "broll_used": [
@@ -440,13 +458,17 @@
     "px43594",
     "px8880",
     "px327898",
-    "px143853"
+    "px143853",
+    "px137265",
+    "px3132",
+    "px47158",
+    "px8252"
   ],
   "ig_music": {
     "strategy": "url",
     "fails": 0,
     "last_fail": "2026-11-18",
     "tried_url": true,
-    "last_ok": "2026-11-23"
+    "last_ok": "2026-11-24"
   }
 }
