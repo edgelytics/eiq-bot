@@ -489,7 +489,8 @@ def draw_calc(L, t, sc, g):
     names = sc.get("names") or ["BOOK A", "BOOK B"]
     p, off = reveal(t, 0.0, 0.3)
     d.text((80, 330 + off), (sc.get("label") or "THE MATH").upper(), font=font(MONO, 40), fill=A(GREEN, 255 * p))
-    example_chip(d, t)
+    if not sc.get("real"):          # game reels use real prices; lessons use made-up examples
+        example_chip(d, t)
     imp = [1 / am_dec(a) for a in odds]
     if mode == "stakes":
         total = float(sc.get("total", 1000))
