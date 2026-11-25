@@ -20,7 +20,8 @@
     "NHL-401892780": "2026-11-23",
     "NFL-401873079": "2026-11-23",
     "NFL-401873081": "2026-11-24",
-    "NBA-401909317": "2026-11-24"
+    "NBA-401909317": "2026-11-24",
+    "NBA-401909320": "2026-11-25"
   },
   "posts": [
     {
@@ -429,6 +430,24 @@
       "audio": "Huss Huss Huss \u2014 Virexo Aelvix",
       "audio_type": "MUSIC",
       "music_attached": true
+    },
+    {
+      "date": "2026-11-25",
+      "slot": "midday",
+      "game": "NBA-401909320",
+      "hook": "Anthony Edwards Out Tonight",
+      "kind": "game",
+      "topic": null,
+      "format": "injury",
+      "writer": "ai",
+      "vo": "Anthony Edwards is officially ruled out tonight against Oklahoma City. That injury report completely shifted this board. DraftKings opened Oklahoma City at plus nine point five, but it swung eleven full points to minus one point five. When superstars sit, markets react fast. The total also cratered ten points down to two twenty-two point five. Is Oklahoma City minus one point five the move tonight",
+      "voice": "am_michael",
+      "theme": "gold",
+      "media_id": "18038096879908898",
+      "permalink": "https://www.instagram.com/reel/DgLEiadAPcF/",
+      "audio": "COUNT UP \u2014 Gunna",
+      "audio_type": "MUSIC",
+      "music_attached": true
     }
   ],
   "broll_used": [
@@ -505,13 +524,17 @@
     "px43594",
     "px8880",
     "px43593",
-    "px26352"
+    "px26352",
+    "px8880",
+    "px43593",
+    "px26352",
+    "px43594"
   ],
   "ig_music": {
     "strategy": "url",
     "fails": 0,
     "last_fail": "2026-11-18",
     "tried_url": true,
-    "last_ok": "2026-11-24"
+    "last_ok": "2026-11-25"
   }
 }
