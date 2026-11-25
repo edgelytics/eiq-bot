@@ -44,6 +44,9 @@ VOICES = {
 }
 VOICE_CHOICE = os.environ.get("EIQ_VOICE", "auto") or "auto"   # dashboard: "auto" rotates, or pin one voice
 THEME_CHOICE = os.environ.get("EIQ_THEME", "auto") or "auto"   # dashboard: "auto" rotates, or pin one design
+# Backgrounds: "motion" = the bot's own animated graphics (motion.py, default since Nov 25, 2026),
+# "mix" = motion + 1 stock clip, "stock" = Pixabay footage only. Override with repo variable EIQ_BROLL.
+BROLL_MODE = (os.environ.get("EIQ_BROLL") or "motion").lower()
 
 # ---------- explainer / promo reels (evergreen "how to" videos that plug Edgelytics IQ) ----------
 EXPLAINER_SLOT = "primetime"      # which slot can turn into an explainer
