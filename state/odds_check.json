@@ -1,37 +1,196 @@
 {
  "games": [
   {
-   "game": "Detroit Pistons @ San Antonio Spurs (NBA)",
-   "espn_home_line": "-9.5",
-   "lines": null,
-   "debug": {}
-  },
-  {
-   "game": "Colorado Avalanche @ Utah Mammoth (NHL)",
+   "game": "Miami Heat @ Philadelphia 76ers (NBA)",
    "espn_home_line": "-1.5",
-   "lines": null,
+   "lines": {
+    "as_of": "2026-11-25T19:01+00:00",
+    "home_favored": true,
+    "consensus_home_spread": -1.5,
+    "spread_range": [
+     -1.5,
+     -1.5
+    ],
+    "books_disagree": false,
+    "best_home": {
+     "book": "DraftKings",
+     "spread": -1.5,
+     "price": -108
+    },
+    "best_away": {
+     "book": "FanDuel",
+     "spread": 1.5,
+     "price": -106
+    },
+    "books": [
+     {
+      "book": "DraftKings",
+      "home_spread": -1.5,
+      "home_price": -108,
+      "away_spread": 1.5,
+      "away_price": -112,
+      "total": 237.5
+     },
+     {
+      "book": "FanDuel",
+      "home_spread": -1.5,
+      "home_price": -114,
+      "away_spread": 1.5,
+      "away_price": -106,
+      "total": 238.5
+     },
+     {
+      "book": "BetMGM",
+      "home_spread": -1.5,
+      "home_price": -110,
+      "away_spread": 1.5,
+      "away_price": -110,
+      "total": 237.5
+     },
+     {
+      "book": "BetRivers",
+      "home_spread": -1.5,
+      "home_price": -109,
+      "away_spread": 1.5,
+      "away_price": -121,
+      "total": 237.5
+     }
+    ]
+   },
    "debug": {}
   },
   {
-   "game": "Charlotte Hornets @ Los Angeles Lakers (NBA)",
-   "espn_home_line": "-7.5",
-   "lines": null,
+   "game": "Chicago Bears @ Detroit Lions (NFL)",
+   "espn_home_line": "+1.5",
+   "lines": {
+    "as_of": "2026-11-25T19:01+00:00",
+    "home_favored": false,
+    "consensus_home_spread": 1.5,
+    "spread_range": [
+     1.5,
+     1.5
+    ],
+    "books_disagree": false,
+    "best_home": {
+     "book": "DraftKings",
+     "spread": 1.5,
+     "price": -109
+    },
+    "best_away": {
+     "book": "FanDuel",
+     "spread": -1.5,
+     "price": -108
+    },
+    "books": [
+     {
+      "book": "DraftKings",
+      "home_spread": 1.5,
+      "home_price": -109,
+      "away_spread": -1.5,
+      "away_price": -110,
+      "total": 55.5
+     },
+     {
+      "book": "FanDuel",
+      "home_spread": 1.5,
+      "home_price": -112,
+      "away_spread": -1.5,
+      "away_price": -108,
+      "total": 55.5
+     },
+     {
+      "book": "BetMGM",
+      "home_spread": 1.5,
+      "home_price": -112,
+      "away_spread": -1.5,
+      "away_price": -108,
+      "total": 55.5
+     },
+     {
+      "book": "BetRivers",
+      "home_spread": 1.5,
+      "home_price": -109,
+      "away_spread": -1.5,
+      "away_price": -112,
+      "total": 55.5
+     }
+    ]
+   },
+   "debug": {}
+  },
+  {
+   "game": "Minnesota Timberwolves @ Oklahoma City Thunder (NBA)",
+   "espn_home_line": "-1.5",
+   "lines": {
+    "as_of": "2026-11-25T19:01+00:00",
+    "home_favored": true,
+    "consensus_home_spread": -1.5,
+    "spread_range": [
+     -1.5,
+     -1.5
+    ],
+    "books_disagree": false,
+    "best_home": {
+     "book": "BetRivers",
+     "spread": -1.5,
+     "price": -112
+    },
+    "best_away": {
+     "book": "BetMGM",
+     "spread": 1.5,
+     "price": -105
+    },
+    "books": [
+     {
+      "book": "DraftKings",
+      "home_spread": -1.5,
+      "home_price": -114,
+      "away_spread": 1.5,
+      "away_price": -106,
+      "total": 222.5
+     },
+     {
+      "book": "FanDuel",
+      "home_spread": -1.5,
+      "home_price": -114,
+      "away_spread": 1.5,
+      "away_price": -106,
+      "total": 222.5
+     },
+     {
+      "book": "BetMGM",
+      "home_spread": -1.5,
+      "home_price": -115,
+      "away_spread": 1.5,
+      "away_price": -105,
+      "total": 222.5
+     },
+     {
+      "book": "BetRivers",
+      "home_spread": -1.5,
+      "home_price": -112,
+      "away_spread": 1.5,
+      "away_price": -118,
+      "total": 222.5
+     }
+    ]
+   },
    "debug": {}
   }
  ],
  "key_info": {
-  "saved_length": 32,
-  "cleaned_length": 32,
+  "saved_length": 0,
+  "cleaned_length": 0,
   "has_space_inside": false,
   "had_newline": false,
-  "char_types": "9a",
+  "char_types": "",
   "looks_labelled": false
  },
  "auth_probes": {
-  "v5 header": "401 {\"error\":401,\"message\":\"invalid apiKey\",\"code\":\"invalid_api_key\"}",
-  "v5 query": "401 {\"error\":401,\"message\":\"invalid apiKey\",\"code\":\"invalid_api_key\"}",
-  "v4 query": "401 {\"error\":{\"message\":\"Invalid API key\",\"code\":\"INVALID_API_KEY\",\"details\":\"The provided API",
+  "v5 header": "401 {\"error\":401,\"message\":\"missing apiKey\",\"code\":\"missing_api_key\"}",
+  "v5 query": "401 {\"error\":401,\"message\":\"missing apiKey\",\"code\":\"missing_api_key\"}",
+  "v4 query": "401 {\"error\":{\"message\":\"Missing API key\",\"code\":\"MISSING_API_KEY\",\"details\":\"Please provide a",
   "v4 header": "401 {\"error\":{\"message\":\"Missing API key\",\"code\":\"MISSING_API_KEY\",\"details\":\"Please provide a"
  },
- "sports": "key rejected by v5 (HTTP 401: {\"error\":401,\"message\":\"invalid apiKey\",\"code\":\"invalid_api_key\"}) and v4 (HTTP 401: {\"error\":{\"message\":\"Invalid API key\",\"code\":\"INVALID_API_KEY\",\"details\":\"The provided API key is invalid or does not ex)"
+ "sports": "key rejected by v5 (HTTP 401: {\"error\":401,\"message\":\"missing apiKey\",\"code\":\"missing_api_key\"}) and v4 (HTTP 401: {\"error\":{\"message\":\"Missing API key\",\"code\":\"MISSING_API_KEY\",\"details\":\"Please provide a valid API key in the request )"
 }
