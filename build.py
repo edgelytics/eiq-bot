@@ -14,6 +14,8 @@ import numpy as np
 import audio
 from render import render_video
 from broll import fetch_clips
+import motion
+import config
 
 LEAD = {"hook": 0.35}         # silence before the line starts (hook leaves room for the impact)
 TAIL = 0.32                   # breathing room after each line
@@ -52,8 +54,14 @@ def build_reel(script, game, base, used_broll=()):
     os.makedirs(os.path.dirname(base) or ".", exist_ok=True)
     timeline, total = build_timeline(script)
     post_wav, prev_wav = build_audio(timeline, total)
-    clips, clip_ids = fetch_clips(script.get("broll_query", "stadium lights"), n=4,
-                                  league=(game or {}).get("league"), used=used_broll)
+    mode = config.BROLL_MODE
+    clips, clip_ids = [], []
+    if mode in ("stock", "mix"):
+        clips, clip_ids = fetch_clips(script.get("broll_query", "stadium lights"), n=4 if mode == "stock" else 1,
+                                      league=(game or {}).get("league"), used=used_broll)
+    if mode != "stock" or not clips:
+        bgs, _ = motion.make_backgrounds(game, n=4 - len(clips))
+        clips = bgs + clips                                   # stock ids only go to state (motion has none)
     print(f"[build] {total:.1f}s, {len(timeline)} scenes, b-roll clips: {len(clips)}")
 
     with tempfile.TemporaryDirectory() as td:
