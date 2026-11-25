@@ -1,7 +1,7 @@
 """
 broll.py — real background footage, different every video.
 
-Sources (first one with a key wins):
+Sources:
   Pixabay  (PIXABAY_API_KEY, free, commercial use OK)  pixabay.com/api/docs
   Pexels   (PEXELS_API_KEY, if you ever get one)
 The bot remembers clip IDs it already used (state file) so footage doesn't repeat.
@@ -42,6 +42,14 @@ BANNED_TAGS = {
     "NBA": ["netball", "volleyball"],
     "NHL": ["field hockey", "figure skating"],
 }
+# Atmosphere footage: used when the sport's own clips run out (Pixabay only has a few hundred per sport).
+# Crowds, arena lights, cash, phones, city nights - fits any betting reel. Every reel still keeps >=1 real game clip.
+ATMOS_QUERIES = ["crowd cheering arena", "sports fans cheering", "stadium lights night", "sports bar", "fans watching tv",
+                 "money cash counting", "dollar bills", "phone scrolling", "smartphone hand night", "city skyline night",
+                 "neon lights city", "scoreboard", "arena", "stadium crowd", "celebration crowd"]
+ATMOS_BANNED = ["soccer", "rugby", "cricket", "baseball", "tennis", "golf", "volleyball", "futsal", "fifa", "goalkeeper",
+                "casino", "slot machine", "poker", "roulette", "protest", "riot", "church", "temple"]
+SPORT_WORD = {"NBA": "basketball", "NHL": "hockey", "NFL": "american football", "CFB": "american football"}
 ALWAYS_BANNED = ["wedding", "christmas", "baby", "cat", "dog", "food", "nature", "beach", "flower", "concert",
                  "dance", "yoga", "fitness", "gym", "kids", "children", "toy", "cartoon", "animation", "3d"]
 
@@ -55,6 +63,15 @@ def _on_topic(tags, league):
     return any(has(r) for r in req) if req else True
 
 
+def _atmos_ok(tags, league):
+    t = " " + re.sub(r"[^a-z0-9 ]+", " ", (tags or "").lower()) + " "
+    has = lambda w: f" {w} " in t
+    other_sports = [w for lg, w in SPORT_WORD.items() if w != SPORT_WORD.get(league)]
+    if league in ("NBA", "NHL"):
+        other_sports.append("football")        # bare "football" on Pixabay is usually soccer
+    return not any(has(b) for b in ALWAYS_BANNED + ATMOS_BANNED + other_sports)
+
+
 def _download(url, path):
     with requests.get(url, stream=True, timeout=90) as d:
         d.raise_for_status()
@@ -63,7 +80,7 @@ def _download(url, path):
                 out.write(chunk)
 
 
-def _pixabay(query, used, league=None):
+def _pixabay(query, used, league=None, atmos=False):
     r = requests.get("https://pixabay.com/api/videos/",
                      params={"key": PIXABAY_KEY, "q": query, "per_page": 120, "safesearch": "true",
                              "video_type": "film"}, timeout=20)   # tag filter below keeps it on-topic
@@ -72,7 +89,7 @@ def _pixabay(query, used, league=None):
     for h in r.json().get("hits", []):
         if h.get("duration", 0) < 5 or f"px{h['id']}" in used:
             continue
-        if not _on_topic(h.get("tags"), league):
+        if not (_atmos_ok(h.get("tags"), league) if atmos else _on_topic(h.get("tags"), league)):
             continue
         v = h.get("videos", {})
         f = v.get("large") if (v.get("large") or {}).get("url") else v.get("medium")
@@ -102,16 +119,16 @@ def _pexels(query, used):
     return out
 
 
-def _search(queries, n, used, league):
+def _search(queries, n, used, league, atmos=False):
     pool = []
     for q in queries:
         try:
             got = []
             if PIXABAY_KEY:
-                got += _pixabay(q, used, league)
+                got += _pixabay(q, used, league, atmos)
             if PEXELS_KEY:
                 got += _pexels(q, used)
-            print(f"[broll] '{q}': {len(got)} on-topic clips")
+            print(f"[broll] '{q}': {len(got)} {'atmosphere' if atmos else 'on-topic'} clips")
             pool += [c for c in got if c[0] not in {x[0] for x in pool}]
         except Exception as e:
             print(f"[broll] search '{q}' failed: {e}")
@@ -159,16 +176,25 @@ def fetch_clips(query, n=3, folder="cache/broll", league=None, used=()):
     if not queries:
         queries = [q.strip() for q in (query or "stadium lights").split("|") if q.strip()]
     pool = _search(queries, n, used, league)
-    if len(pool) < n and used:
-        # not enough fresh on-topic clips: top up with ones used before rather than go off-topic
-        have = {c[0] for c in pool}
-        older = [c for c in _search(queries, n, recent, league) if c[0] not in have]
-        older.sort(key=lambda c: last_seen.get(c[0], -1))        # used longest ago first, not "best" first
-        print(f"[broll] only {len(pool)} fresh clips — adding {min(len(older), n - len(pool))} reused")
-        fresh_paths, fresh_ids = _download_pool(pool, n, folder) if pool else ([], [])
-        old_paths, old_ids = _download_pool(older[:max(n - len(fresh_ids), 0)], n - len(fresh_ids), folder, keep_order=True)
-        return fresh_paths + old_paths, fresh_ids + old_ids
-    return _download_pool(pool, n, folder)
+    if len(pool) >= n:
+        return _download_pool(pool, n, folder)
+    paths, ids = _download_pool(pool, n, folder) if pool else ([], [])
+    # 1) out of fresh game clips: fill with fresh atmosphere footage, keeping at least one real game clip
+    need = n - max(len(ids), 1) if league else 0
+    if need > 0 and PIXABAY_KEY:
+        aq = list(ATMOS_QUERIES)
+        random.shuffle(aq)
+        p, i = _download_pool(_search(aq, need, used, league, atmos=True), need, folder)
+        print(f"[broll] only {len(ids)} fresh game clips — adding {len(i)} fresh atmosphere clips")
+        paths, ids = paths + p, ids + i
+    # 2) still short: reuse game clips used longest ago (never one from the last ~10 reels)
+    if len(ids) < n and used:
+        older = [c for c in _search(queries, n, recent, league) if c[0] not in set(ids)]
+        older.sort(key=lambda c: last_seen.get(c[0], -1))
+        p, i = _download_pool(older[:n - len(ids)], n - len(ids), folder, keep_order=True)
+        print(f"[broll] adding {len(i)} reused game clips")
+        paths, ids = p + paths, i + ids        # real game clip first
+    return paths, ids
 
 
 class ClipReader:
