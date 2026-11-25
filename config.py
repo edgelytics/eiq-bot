@@ -15,6 +15,10 @@ SLOTS = [
      "angle": "Tonight's biggest game: the number, the public trap, and the disciplined way to approach it."},
 ]
 
+# Which slots actually post. Owner (Nov 25, 2026): quality over volume, 1 reel a day at primetime.
+# Add "midday" / "afternoon" back here to post more often. Forced runs from the dashboard still work for any slot.
+ACTIVE_SLOTS = ["primetime"]
+
 # ---------- leagues to scan ----------
 LEAGUES = ["NFL", "NBA", "CFB", "NHL"]
 
@@ -42,8 +46,8 @@ VOICE_CHOICE = os.environ.get("EIQ_VOICE", "auto") or "auto"   # dashboard: "aut
 THEME_CHOICE = os.environ.get("EIQ_THEME", "auto") or "auto"   # dashboard: "auto" rotates, or pin one design
 
 # ---------- explainer / promo reels (evergreen "how to" videos that plug Edgelytics IQ) ----------
-EXPLAINER_SLOT = "midday"         # which slot can turn into an explainer
-EXPLAINER_EVERY_N_DAYS = 2        # 2 = every other day; 1 = every day; 0 = never (unless forced)
+EXPLAINER_SLOT = "primetime"      # which slot can turn into an explainer
+EXPLAINER_EVERY_N_DAYS = 3        # 3 = every third day; 1 = every day; 0 = never (unless forced)
 KIND_CHOICE = os.environ.get("EIQ_KIND", "auto") or "auto"     # auto | game | explainer (forced run)
 TOPIC_CHOICE = os.environ.get("EIQ_TOPIC", "") or ""            # explainer topic id, blank = next in rotation
 
