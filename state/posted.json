@@ -19,7 +19,8 @@
     "NBA-401910037": "2026-11-23",
     "NHL-401892780": "2026-11-23",
     "NFL-401873079": "2026-11-23",
-    "NFL-401873081": "2026-11-24"
+    "NFL-401873081": "2026-11-24",
+    "NBA-401909317": "2026-11-24"
   },
   "posts": [
     {
@@ -410,6 +411,24 @@
       "audio": "AHH YEA \u2014 Playboi Carti",
       "audio_type": "MUSIC",
       "music_attached": true
+    },
+    {
+      "date": "2026-11-24",
+      "slot": "primetime",
+      "game": "NBA-401909317",
+      "hook": "Sixers Model Gap Tomorrow",
+      "kind": "game",
+      "topic": null,
+      "format": "model",
+      "writer": "ai",
+      "vo": "ESPN's model gives Philadelphia a sixty-six percent win chance tomorrow against Miami. DraftKings opened Philly minus three and a half, but it's down to minus one and a half. That win probability translates to a spread around minus four. The market is pricing this much tighter than ESPN's computer model. Are you backing the model or the market move on Philly?",
+      "voice": "af_heart",
+      "theme": "clean",
+      "media_id": "18233258419335362",
+      "permalink": "https://www.instagram.com/reel/DgJWnpGCSbE/",
+      "audio": "Huss Huss Huss \u2014 Virexo Aelvix",
+      "audio_type": "MUSIC",
+      "music_attached": true
     }
   ],
   "broll_used": [
@@ -482,7 +501,11 @@
     "px3132",
     "px47158",
     "px8252",
-    "px143853"
+    "px143853",
+    "px43594",
+    "px8880",
+    "px43593",
+    "px26352"
   ],
   "ig_music": {
     "strategy": "url",
