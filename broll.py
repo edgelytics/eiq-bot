@@ -5,6 +5,8 @@ Sources (first one with a key wins):
   Pixabay  (PIXABAY_API_KEY, free, commercial use OK)  pixabay.com/api/docs
   Pexels   (PEXELS_API_KEY, if you ever get one)
 The bot remembers clip IDs it already used (state file) so footage doesn't repeat.
+Both sources are searched when both keys exist (bigger pool). When fresh clips run out, it reuses the clips
+used LONGEST ago - never one from the last few reels (FRESH_WINDOW).
 """
 import os
 import random
@@ -16,6 +18,7 @@ from config import PEXELS_KEY
 
 PIXABAY_KEY = os.environ.get("PIXABAY_API_KEY")
 W, H, FPS = 1080, 1920, 30
+FRESH_WINDOW = 40          # clip IDs from the last ~10 reels (4 clips each) are never reused
 
 # Searches per sport (all on-topic). The bot rotates through these.
 SPORT_QUERIES = {
@@ -103,7 +106,11 @@ def _search(queries, n, used, league):
     pool = []
     for q in queries:
         try:
-            got = _pixabay(q, used, league) if PIXABAY_KEY else _pexels(q, used)
+            got = []
+            if PIXABAY_KEY:
+                got += _pixabay(q, used, league)
+            if PEXELS_KEY:
+                got += _pexels(q, used)
             print(f"[broll] '{q}': {len(got)} on-topic clips")
             pool += [c for c in got if c[0] not in {x[0] for x in pool}]
         except Exception as e:
@@ -113,11 +120,14 @@ def _search(queries, n, used, league):
     return pool
 
 
-def _download_pool(pool, n, folder):
+def _download_pool(pool, n, folder, keep_order=False):
     # best-quality clips first, then shuffle the top group so videos still look different
-    pool = sorted(pool, key=lambda c: c[2], reverse=True)
-    top = pool[:max(n * 3, 10)]
-    random.shuffle(top)
+    if keep_order:
+        top = list(pool)
+    else:
+        pool = sorted(pool, key=lambda c: c[2], reverse=True)
+        top = pool[:max(n * 3, 10)]
+        random.shuffle(top)
     paths, ids = [], []
     for cid, url, _q in top:
         if cid in ids:
@@ -140,7 +150,10 @@ def fetch_clips(query, n=3, folder="cache/broll", league=None, used=()):
     if not (PIXABAY_KEY or PEXELS_KEY):
         return [], []
     os.makedirs(folder, exist_ok=True)
-    used = set(used)
+    order = list(used)
+    last_seen = {cid: i for i, cid in enumerate(order)}      # higher = used more recently
+    recent = set(order[-FRESH_WINDOW:])
+    used = set(order)
     queries = list(SPORT_QUERIES.get(league, []))
     random.shuffle(queries)
     if not queries:
@@ -149,11 +162,11 @@ def fetch_clips(query, n=3, folder="cache/broll", league=None, used=()):
     if len(pool) < n and used:
         # not enough fresh on-topic clips: top up with ones used before rather than go off-topic
         have = {c[0] for c in pool}
-        older = [c for c in _search(queries, n, set(), league) if c[0] not in have]
-        older.sort(key=lambda c: c[2], reverse=True)
+        older = [c for c in _search(queries, n, recent, league) if c[0] not in have]
+        older.sort(key=lambda c: last_seen.get(c[0], -1))        # used longest ago first, not "best" first
         print(f"[broll] only {len(pool)} fresh clips — adding {min(len(older), n - len(pool))} reused")
         fresh_paths, fresh_ids = _download_pool(pool, n, folder) if pool else ([], [])
-        old_paths, old_ids = _download_pool(older[:max(n - len(fresh_ids), 0) * 2], n - len(fresh_ids), folder)
+        old_paths, old_ids = _download_pool(older[:max(n - len(fresh_ids), 0)], n - len(fresh_ids), folder, keep_order=True)
         return fresh_paths + old_paths, fresh_ids + old_ids
     return _download_pool(pool, n, folder)
 
