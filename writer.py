@@ -119,7 +119,7 @@ def _claude(prompt, max_tokens=1500):
     client = anthropic.Anthropic()
     msg = client.messages.create(model=CLAUDE_MODEL, max_tokens=max_tokens,
                                  messages=[{"role": "user", "content": prompt}])
-    return msg.content[0].text.strip()
+    return "".join(b.text for b in msg.content if getattr(b, "type", "") == "text").strip()
 
 
 _GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta"
@@ -198,7 +198,7 @@ def llm(prompt, json_mode=False, short=False):
     """Returns text from the best available model, or None if none configured / all fail."""
     if os.environ.get("ANTHROPIC_API_KEY"):
         try:
-            return _claude(prompt, 20 if short else 1500)
+            return _claude(prompt, 2000 if short else 6000)
         except Exception as e:
             print(f"[writer] Claude failed ({e})")
     if os.environ.get("GEMINI_API_KEY"):
