@@ -79,8 +79,8 @@ def find_special_game(sp):
 
 
 def upcoming_slot(now):
-    """Slot whose post time is between 10 min ago and 50 min from now."""
-    for sl in config.SLOTS:
+    """Active slot whose post time is between 10 min ago and 50 min from now."""
+    for sl in [s for s in config.SLOTS if s["name"] in config.ACTIVE_SLOTS]:
         hh, mm = map(int, sl["post"].split(":"))
         post_at = now.replace(hour=hh, minute=mm, second=0, microsecond=0)
         mins = (post_at - now).total_seconds() / 60
