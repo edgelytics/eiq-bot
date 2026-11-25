@@ -19,12 +19,17 @@ SCRIPT_PROMPT = """You write viral short-form Reels for Edgelytics IQ ({handle})
 analytics + education brand. Voice: sharp, confident, numbers-first, a little contrarian,
 talks like a smart friend who just read the news — never a tout. Rules:
 - NEVER promise wins, never say "lock", "guaranteed", "free money".
-- Every reel must tell the viewer something NEW and SPECIFIC about THIS game: a report, a line move,
-  an injury, what ESPN's model says vs the betting number. If a sentence could be said about any game, cut it.
+- SHAREABILITY IS THE GOAL. Write it so a bettor would send it to a friend or argue in the comments:
+  a surprising number, a myth busted, a trap exposed, or a take people will disagree with.
+  Just reporting that a line moved or what ESPN's model says is NOT enough - that's info people already have.
+- Every reel must still be about THIS game and use its real facts. If a sentence could be said about any game, cut it.
 - Use ONLY the facts below. Don't invent stats, injuries, quotes, trends or records.
 - Match the sport's language: NFL/CFB/NBA spreads are "points"; NHL uses the "puck line" and "the dog".
 - The game is played {when} — say it that way, don't say "tonight" unless it is tonight.
-- First 1.5 seconds must stop the scroll, and the hook must be about THIS game's news (name the team/player).
+- THE FIRST SECOND decides everything. The hook "text" is a bold, arguable CLAIM or a shocking number - never a
+  headline. Bad: "Rams line dropping fast", "ESPN gives Sixers 66%", "Temple support fading".
+  Good: "Vegas thinks the Rams are frauds", "This -250 favorite is a trap", "You need 71% just to break even".
+  The hook "vo" says the claim in the first sentence, max 12 words, naming the team or player.
 - Voiceover total 50-65 words (~22-28 seconds). Short punchy sentences. Write numbers the way
   they're spoken ("three and a half", "minus one-ten").
 - Attribute facts naturally: "ESPN is reporting...", "ESPN's model gives them 62 percent",
@@ -44,6 +49,10 @@ Scene types you can use (hook first, cta last, 3-5 scenes in between, in the ord
   number  — line-movement / key-number graphic: {{"type":"number","vo":"...","label":"max 4 words"}}
   books   — ONLY if facts.sportsbook_lines.books_disagree is true: {{"type":"books","vo":"...","label":"max 4 words"}}
   point   — {{"type":"point","vo":"...","eyebrow":"2-3 words","text":"max 6 words"}}
+  calc    — odds math on screen using REAL prices from the facts (moneylines in facts.line_movement):
+            {{"type":"calc","mode":"odds" or "vig","odds":[<american odds>, <american odds>],"names":["TEAM A","TEAM B"],
+              "label":"max 4 words","vo":"..."}}  mode odds = what you bet to win and the implied %; vig = the book's cut.
+            Only use numbers that are in the facts.
   cta     — {{"type":"cta","vo":"a question specific to this game that makes people comment + follow","text":"max 6 words"}}
 
 Slot note: {angle}
@@ -79,17 +88,31 @@ FORMATS = {
                 "our play and the reasoning — confident, never 'lock' or 'guaranteed', and remind them to shop the line. "
                 "Only quote numbers that are in the data. CTA: 'Over or under? Comment.'"),
     "matchup": ("Sharp Angle", "Find the single most interesting fact in the data and build the whole reel around it."),
+    # --- shareable formats (Nov 25, 2026): these replace "move" and "model" in the rotation ---
+    "math":    ("The Real Math", "Use this game's REAL moneylines to show something most bettors don't realize: how often "
+                "the favorite must win just to break even, what the underdog price really implies, or how much the book "
+                "keeps. Put it on screen with a 'calc' scene (real odds). Hook = the shocking number, e.g. "
+                "'You need 71% just to break even on Boston'. End by asking if that price is worth it."),
+    "trap":    ("Public Trap", "Make the case that the side most casual bettors will love in this game is a bad price. Back it "
+                "with the real facts (injuries, the line, ATS records, model vs market). Hook = the claim, e.g. "
+                "'Everyone's betting Dallas. That's the problem.' Confident, never mean to fans."),
+    "take":    ("Hot Take", "Take a clear, arguable side on ONE question about this game (who's overrated, is the spread too big, "
+                "does this injury matter more than the market thinks) and defend it with the real facts. The CTA asks "
+                "people who disagree to say so in the comments. Hook = the take, short and bold."),
 }
 
 
 def eligible_formats(game):
     f = (game or {}).get("facts") or {}
     out = []
+    # "move" and "model" are retired from the rotation (they got no shares); their facts feed the formats below.
+    lm = f.get("line_movement") or {}
+    if any(k.endswith("moneyline_now") and lm.get(k) for k in lm): out.append("math")
+    if f.get("injuries") or f.get("espn_win_prob") or lm: out.append("trap")
+    out.append("take")
     if f.get("reports"): out.append("report")
-    if (f.get("line_movement") or {}).get("moved") or f.get("our_tracked_movement"): out.append("move")
     if f.get("injuries"): out.append("injury")
-    if f.get("espn_win_prob"): out.append("model")
-    return out or ["matchup"]
+    return out
 
 MUSIC_PROMPT = """Pick the best background track for an Instagram Reel about sports betting.
 The list is Instagram's trending chart, most popular first — prefer higher-ranked tracks when they fit.
@@ -228,6 +251,7 @@ def write_script(game, angle, recent_hooks=(), fmt="matchup", recent_lines=()):
                 if sc["type"] in ("hook", "point", "cta"):
                     sc.setdefault("text", sc["vo"][:40])
             s["scenes"] = [sc for sc in s["scenes"] if sc["type"] != "report" or _fill_report(sc, reports)]
+            s["scenes"] = [sc for sc in s["scenes"] if sc["type"] != "calc" or _ok_calc(sc)]
             if not (((game.get("facts") or {}).get("sportsbook_lines") or {}).get("books_disagree")):
                 s["scenes"] = [sc for sc in s["scenes"] if sc["type"] != "books"]
             low = " ".join(sc["vo"] for sc in s["scenes"]).lower()
@@ -248,6 +272,19 @@ def write_script(game, angle, recent_hooks=(), fmt="matchup", recent_lines=()):
 
 BANNED = ("number is lying", "predict games", "follow the money", "price beats opinion", "numbers, not noise",
           "numbers not noise", "stop asking who wins", "split money", "split the money", "books know something")
+
+
+def _ok_calc(sc):
+    """Keep a calc scene only if it has two real American odds; mark it real so no EXAMPLE chip shows."""
+    try:
+        odds = [int(float(str(o).replace("+", ""))) for o in sc.get("odds", [])][:2]
+        assert len(odds) == 2 and all(abs(o) >= 100 for o in odds)
+    except Exception:
+        return False
+    sc["odds"], sc["real"] = odds, True
+    sc["mode"] = sc.get("mode") if sc.get("mode") in ("odds", "vig") else "odds"
+    sc["names"] = (list(sc.get("names") or []) + ["SIDE A", "SIDE B"])[:2]
+    return True
 
 
 def _fill_report(sc, reports):
