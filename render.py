@@ -662,7 +662,7 @@ def render_video(script, game, timeline, total, out_path, broll_paths=(), theme=
     """timeline: list of {scene, start, dur, words:[(w, abs_start, abs_end)]}"""
     apply_theme(theme or script.get("theme"))
     if broll_paths:
-        readers = [ClipReader(p) for p in broll_paths]
+        readers = [p if hasattr(p, "next") else ClipReader(p) for p in broll_paths]   # motion.py backgrounds or files
         bg_src = None
     else:
         readers = []
