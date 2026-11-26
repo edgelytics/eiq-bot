@@ -21,7 +21,8 @@
     "NFL-401873079": "2026-11-23",
     "NFL-401873081": "2026-11-24",
     "NBA-401909317": "2026-11-24",
-    "NBA-401909320": "2026-11-25"
+    "NBA-401909320": "2026-11-25",
+    "NBA-401909325": "2026-11-25"
   },
   "posts": [
     {
@@ -448,6 +449,24 @@
       "audio": "COUNT UP \u2014 Gunna",
       "audio_type": "MUSIC",
       "music_attached": true
+    },
+    {
+      "date": "2026-11-25",
+      "slot": "primetime",
+      "game": "NBA-401909325",
+      "hook": "Spurs Are Overpriced Tonight",
+      "kind": "game",
+      "topic": null,
+      "format": "take",
+      "writer": "ai",
+      "vo": "The Spurs are overpriced tonight, and ESPN's own model agrees. Minus one sixty-two implies sixty-two percent for San Antonio. ESPN has Portland ahead, fifty-one point two. In Portland, the total fell ten points. The spread shrank a full point, to three and a half. Portland's missing Morant and Sharpe. San Antonio's down three players too. Nobody's healthy. Spurs fans, tell me why I'm wrong. Commen",
+      "voice": "am_puck",
+      "theme": "eiq",
+      "media_id": "17964804891256475",
+      "permalink": "https://www.instagram.com/reel/DgL7c9Rmxfy/",
+      "audio": "Huss Huss Huss \u2014 Virexo Aelvix",
+      "audio_type": "MUSIC",
+      "music_attached": true
     }
   ],
   "broll_used": [
@@ -561,6 +580,10 @@
       },
       {
         "t": "2026-11-25T21:30+00:00",
+        "home_spread": 3.5
+      },
+      {
+        "t": "2026-11-26T01:10+00:00",
         "home_spread": 3.5
       }
     ]
