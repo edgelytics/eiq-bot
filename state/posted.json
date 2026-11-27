@@ -22,7 +22,8 @@
     "NFL-401873081": "2026-11-24",
     "NBA-401909317": "2026-11-24",
     "NBA-401909320": "2026-11-25",
-    "NBA-401909325": "2026-11-25"
+    "NBA-401909325": "2026-11-25",
+    "CFB-401862840": "2026-11-26"
   },
   "posts": [
     {
@@ -467,6 +468,24 @@
       "audio": "Huss Huss Huss \u2014 Virexo Aelvix",
       "audio_type": "MUSIC",
       "music_attached": true
+    },
+    {
+      "date": "2026-11-26",
+      "slot": "primetime",
+      "game": "CFB-401862840",
+      "hook": "UTSA's 9-2 Record Is The Trap",
+      "kind": "game",
+      "topic": null,
+      "format": "trap",
+      "writer": "ai",
+      "vo": "UTSA's nine and two record is the trap in this game. Tulsa at UTSA tomorrow. UTSA opened minus two and a half. Now it's plus one and a half. Tulsa's minus one twenty-two now. That needs fifty-five percent. ESPN's model says fifty point nine. Books don't even agree. FanDuel has UTSA favored. DraftKings has them getting one and a half. Is UTSA's nine and two worth paying for?",
+      "voice": "af_bella",
+      "theme": "neon",
+      "media_id": "18180318292454466",
+      "permalink": "https://www.instagram.com/reel/DgOgNUoikQL/",
+      "audio": "Burn This Shit Down \u2014 Travis Scott",
+      "audio_type": "MUSIC",
+      "music_attached": true
     }
   ],
   "broll_used": [
@@ -570,7 +589,7 @@
     "fails": 0,
     "last_fail": "2026-11-18",
     "tried_url": true,
-    "last_ok": "2026-11-25"
+    "last_ok": "2026-11-26"
   },
   "lines": {
     "NBA-401909325": [
@@ -585,6 +604,12 @@
       {
         "t": "2026-11-26T01:10+00:00",
         "home_spread": 3.5
+      }
+    ],
+    "CFB-401862840": [
+      {
+        "t": "2026-11-27T01:10+00:00",
+        "home_spread": 0.25
       }
     ]
   }
