@@ -486,6 +486,24 @@
       "audio": "Burn This Shit Down \u2014 Travis Scott",
       "audio_type": "MUSIC",
       "music_attached": true
+    },
+    {
+      "date": "2026-11-27",
+      "slot": "primetime",
+      "game": "explainer-keynums",
+      "hook": "-2.5 VS -3",
+      "kind": "explainer",
+      "topic": "keynums",
+      "format": null,
+      "writer": null,
+      "vo": "Why is minus two and a half so different from minus three? Key numbers. Football scores come in threes and sevens, so more NFL games land on a three point margin than any other. Seven is next. That's why minus two and a half and minus three and a half are worlds apart. One wins on a three point game, the other loses. If you can get to the right side of three or seven, it's often worth paying a lit",
+      "voice": "am_fenrir",
+      "theme": "heat",
+      "media_id": "18291966031288750",
+      "permalink": "https://www.instagram.com/reel/DgRFHKrCdcP/",
+      "audio": "Burn This Shit Down \u2014 Travis Scott",
+      "audio_type": "MUSIC",
+      "music_attached": true
     }
   ],
   "broll_used": [
@@ -589,7 +607,7 @@
     "fails": 0,
     "last_fail": "2026-11-18",
     "tried_url": true,
-    "last_ok": "2026-11-26"
+    "last_ok": "2026-11-27"
   },
   "lines": {
     "NBA-401909325": [
